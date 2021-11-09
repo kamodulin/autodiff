@@ -155,14 +155,18 @@ class Dual:
     def __gt__(self):
         ...
 
-    def __le__(self):
-        ...
+    def __le__(self, other):
+        if other := self._compatible(other, "<="):
+            return self.val <= other.val
 
-    def __ge__(self):
-        ...
+    def __ge__(self, other):
+        if other := self._compatible(other, ">="):
+            return self.val >= other.val
 
-    def __eq__(self):
-        ...
+    def __eq__(self, other):
+        if other := self._compatible(other, "=="):
+            return self.val == other.val
 
-    def __ne__(self):
-        ...
+    def __ne__(self, other):
+        if other := self._compatible(other, "!="):
+            return self.val != other.val
