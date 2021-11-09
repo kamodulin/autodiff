@@ -73,7 +73,7 @@ class Dual:
 
     def _compatible(self, other, operand=None):
         """
-        Check if other element is of correct type `Dual` and ensure that the
+        Return other element if compatible with type `Dual` and ensure that the
         number of dimensions match between the two Duals.
 
         Parameters
@@ -82,26 +82,29 @@ class Dual:
 
         Returns
         -------
-        out : True, ArithmeticError, or TypeError
-            True if `other` is compatible. Raise error if other does not have
+        out : Dual, ArithmeticError, or TypeError
+            Dual if `other` is compatible. Raise error if other does not have
             matching dimensions or not of correct type.
 
         Examples
         --------
         >>> d0 = Dual(42)
         >>> d0._compatible(Dual(1))
-        True
+        Dual(1, array([1]))
         >>> d0._compatible(Dual(10, [0, 1]))
-        ArithmeticError: Dimensionality mismatch between Dual(42, array([1]))
-        and Dual(10, array([0, 1]))
+        Traceback (most recent call last):
+        ...
+        ArithmeticError: Dimensionality mismatch between Dual(42, array([1])) and Dual(10, array([0, 1]))
         >>> d0._compatible("autodiff")
-        TypeError: unsupported operand type(s) for *: 'Dual' and 'str'
+        Traceback (most recent call last):
+        ...
+        TypeError: unsupported operand type(s) for None: 'Dual' and 'str'
         """
         if isinstance(other, (int, float)):
-            return True
+            return Dual.constant(other, ndim=self.ndim)
         elif isinstance(other, Dual):
             if self.ndim == other.ndim:
-                return True
+                return other
             raise ArithmeticError(
                 f"Dimensionality mismatch between {self} and {other}")
         raise TypeError(
@@ -112,9 +115,7 @@ class Dual:
         return f"{self.__class__.__name__}({self.val}, {np.array_repr(self.der)})"
 
     def __add__(self, other):
-        if self._compatible(other, "+"):
-            if isinstance(other, (int, float)):
-                other = Dual.constant(other, ndim=self.ndim)
+        if other := self._compatible(other, "+"):
             return Dual(self.val + other.val, self.der + other.der)
 
     def __radd__(self, other):
@@ -127,11 +128,8 @@ class Dual:
         ...
 
     def __mul__(self, other):
-        if self._compatible(other, "*"):
-            if isinstance(other, (int, float)):
-                other = Dual.constant(other, ndim=self.ndim)
-            return Dual(self.val * other.val,
-                        self.val * other.der + self.der * other.val)
+        if other := self._compatible(other, "*"):
+            return Dual(self.val * other.val, self.val * other.der + self.der * other.val)
 
     def __rmul__(self, other):
         return self * other
