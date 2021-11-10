@@ -14,11 +14,9 @@ def cos(x):
 
 
 def tan(x):
-    try:
-        return Dual(np.tan(x.val), x.der / (np.cos(x.val)**2))
-    except ZeroDivisionError:
+    if np.isclose(np.cos(x.val), 0):
         raise ValueError(f"Derivative of tan(x) is undefined for x = {x.val}")
-
+    return Dual(np.tan(x.val), x.der / (np.cos(x.val)**2))
 
 def exp(x):
     ...
