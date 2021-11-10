@@ -129,7 +129,8 @@ class Dual:
 
     def __mul__(self, other):
         if other := self._compatible(other, "*"):
-            return Dual(self.val * other.val, self.val * other.der + self.der * other.val)
+            return Dual(self.val * other.val,
+                        self.val * other.der + self.der * other.val)
 
     def __rmul__(self, other):
         return self * other
