@@ -158,16 +158,16 @@ class Dual:
 
     def __le__(self, other):
         if other := self._compatible(other, "<="):
-            return self.val <= other.val
+            return self.val <= other.val, self.der <= other.der
 
     def __ge__(self, other):
         if other := self._compatible(other, ">="):
-            return self.val >= other.val
+            return self.val >= other.val, self.der >= other.der
 
     def __eq__(self, other):
         if other := self._compatible(other, "=="):
-            return self.val == other.val
+            return self.val == other.val, self.der == other.der
 
     def __ne__(self, other):
         if other := self._compatible(other, "!="):
-            return self.val != other.val
+            return self.val != other.val, self.der != other.der
