@@ -19,7 +19,7 @@ def tan(x):
     return Dual(np.tan(x.val), x.der / (np.cos(x.val)**2))
 
 def exp(x):
-    ...
+    return Dual(np.exp(x.val), np.exp(x.val) * x.der)
 
 
 def log(x):
