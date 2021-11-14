@@ -79,7 +79,6 @@ class Dual:
         Parameters
         ----------
         other : Dual
-
         Returns
         -------
         out : Dual, ArithmeticError, or TypeError
@@ -141,11 +140,15 @@ class Dual:
     def __rtruediv__(self):
         ...
 
-    def __pow__(self):
-        ...
+    def __pow__(self, other):
+        if other := self._compatible(other, "**"):
+            return Dual(self.val ** other.val, 
+                        other.val*(self.val**(other.val-1))*self.der)
 
-    def __rpow__(self):
-        ...
+    def __rpow__(self, other):
+        if other := self._compatible(other, "**"):
+            return Dual(other.val ** self.val,
+                        self.val*(other.val**(self.val-1))*other.der)
 
     def __neg__(self):
         ...
