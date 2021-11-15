@@ -1,8 +1,13 @@
 language: python
-python: 3.7                 
-before_install: 
-    - pip install codecov
-    - pip install coverage
-    - pip install scikit-learn
+python: 3.8
+
+before_install: python -m pip install build pytest pytest-cov
+
+install: (python -m build --wheel && python -m pip install dist/*)
+
+script: (cd autodiff/tests && sh ./run_tests.sh pytest coverage --cov=autodiff --cov-report=term-missing --cov-report xml)
+
 after_success:
-    - codecov
+  - curl -Os https://uploader.codecov.io/latest/linux/codecov
+  - chmod +x codecov
+  - ./codecov -t ${CODECOV_TOKEN}
