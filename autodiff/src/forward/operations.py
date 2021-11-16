@@ -23,9 +23,9 @@ def exp(x):
 
 
 def log(x):
-    if x.val == 0:
+    if x.val <= 0:
         raise ValueError(f"Log of x is undefined for x = {x.val}")
-    return Dual(np.log(x.val), x.der / x)
+    return Dual(np.log(x.val), x.der / x.val)
 
 
 def sqrt(x):
