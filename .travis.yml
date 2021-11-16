@@ -5,7 +5,7 @@ before_install: python -m pip install build pytest pytest-cov
 
 install: (python -m build --wheel && python -m pip install dist/*)
 
-script: (cd autodiff/tests && sh ./run_tests.sh pytest coverage --cov=autodiff --cov-report=term-missing --cov-report xml)
+script: sh autodiff/tests/run_tests.sh pytest coverage --cov=autodiff --cov-report=xml
 
 after_success:
   - curl -Os https://uploader.codecov.io/latest/linux/codecov
