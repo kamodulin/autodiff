@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 tests=(
-    test_dual.py
-    test_operations.py
+    autodiff/tests/test_dual.py
+    autodiff/tests/test_operations.py
 )
 
 test='pytest'
@@ -21,6 +21,6 @@ elif [[ $# -gt 1 && ${2} == 'unittest'* ]]; then
     driver="${test} -v"
 fi
 
-export PYTHONPATH="$PWD/../../"
+export PYTHONPATH="$PWD"
 # run the tests
 ${driver} ${tests[@]}
