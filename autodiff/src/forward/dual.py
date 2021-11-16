@@ -142,13 +142,17 @@ class Dual:
 
     def __pow__(self, other):
         if other := self._compatible(other, "**"):
-            return Dual(self.val ** other.val, 
-                        other.val*(self.val**(other.val-1))*self.der)
+            if other.der == 0: 
+                return Dual(self.val ** other.val, 
+                            other.val*(self.val**(other.val-1))*self.der)
+            else:
+                der_comp_2 = other.der*np.log(self.val) + other.val*(self.der/self.val)
+                return Dual(self.val ** other.val,
+                            (self.val ** other.val)*der_comp_2)
 
     def __rpow__(self, other):
         if other := self._compatible(other, "**"):
-            return Dual(other.val ** self.val,
-                        self.val*(other.val**(self.val-1))*other.der)
+            return other ** self
 
     def __neg__(self):
         ...
