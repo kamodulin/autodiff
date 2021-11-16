@@ -3,7 +3,16 @@ import pytest
 
 import autodiff as ad
 
-from utils import _equal, _compare
+#from utils import _equal, _compare
+
+def _equal(x, val, der):
+    return x.val == val and np.all(x.der == der)
+
+
+def _compare(comparison, val, der):
+    x = ad.Dual(*comparison)
+    return _equal(x, val, der)
+
 
 
 @pytest.mark.parametrize("val", [1, -6.2])
@@ -56,7 +65,123 @@ def test_pow_multi():
     x, y = ad.Dual.from_array([2, 2])
     assert _equal(x**y, 4, 2.77258872)
     
+def test_sub_constants():
+    x = ad.Dual.constant(1)    # two constants
+    y = ad.Dual.constant(2)
+    assert _equal(x-y,-1,0)
+
+def test_sub_univariate():
+    x, y = ad.Dual(1, 11), ad.Dual(2, 2)  # two univariate
+    assert _equal(x-y,-1,9)
+
+    a = 2 # one number and one univariate
+    assert _equal(x-a,-1,11)
+
+def test_sub_multivariate():
+    x, y = ad.Dual.from_array([6, 4]) # two multivariate
+    assert _equal(x-y,2,[1.0,-1.0])
+
+    z = 2
+    assert _equal(x-z,4,[1.0,0.0])    # one multivariate and one number
+
+def test_rsub_constants():
+    x = ad.Dual.constant(1)    # number subtract one constants
+    assert _equal(0-x,-1,0)
+
+def test_rsub_multivariate():
+    x, y = ad.Dual.from_array([6, 4]) # number subtract multivariate
+    assert _equal(0-x,-6,[-1.0,0.0])
+
+    z = 2
+    assert _equal(0-y,-4,[0.0,-1.0])
+
+def test_truediv_constants():
+    x = ad.Dual.constant(1)    # two constants
+    y = ad.Dual.constant(2)
+    assert _equal(x/y,0.5,0)
+
+def test_truediv_univariate():
+    x, y = ad.Dual(1, 11), ad.Dual(2, 2)  # two univariate
+    assert _equal(x/y,0.5,5.0)
+
+    a = 2 # one number and one univariate
+    assert _equal(x/a,0.5,11/2)
+
+def test_truediv_multivariate():
+    x, y = ad.Dual.from_array([6, 4]) # two multivariate
+    assert _equal(x/y,6/4,[1/4,-3/8])
+
+    z = 2
+    assert _equal(x/z,3,[1/2,0.0])    # one multivariate and one number
+
 # Add more comparison tests (e.g. <, >)
+def test_neg_constants():
+    x = ad.Dual.constant(2)
+    y = ad.Dual.constant(-2)
+    val = True
+    der = True
+    assert _compare((-x == y), val, der)
+
+def test_neg_univariate():
+    x, y = ad.Dual(-1, 11), ad.Dual(1, 11)
+    val = True
+    der = False
+    assert _compare((-x == y), val, der)
+
+
+def test_lt_multivariate():
+    x, y = ad.Dual.from_array([6, 4])
+    val = False
+    der = [True, True]
+    assert _compare((-x == y), val, der)
+
+
+def test_lt_constants():
+    x = ad.Dual.constant(2)
+    y = ad.Dual.constant(3)
+    val = True
+    der = False
+    assert _compare((x < y), val, der)
+
+
+def test_lt_univariate():
+    x, y = ad.Dual(1, 11), ad.Dual(2, 20)
+    val = True
+    der = True
+    assert _compare((x < y), val, der)
+
+
+def test_lt_multivariate():
+    x, y = ad.Dual.from_array([6, -6])
+    val = True
+    der = [False, False]
+    assert _compare((-x == y), val, der)
+
+
+def test_gt_constants():
+    x = ad.Dual.constant(1)
+    y = ad.Dual.constant(2)
+    val = True
+    der = False
+    assert _compare((x > y), val, der)
+
+
+def test_gt_univariate():
+    x, y = ad.Dual(1, 11), ad.Dual(2, -5)
+    val = False
+    der = True
+    assert _compare((x > y), val, der)
+
+
+def test_gt_multivariate():
+    x, y = ad.Dual.from_array([8, 2])
+    val = True
+    der = [True, False]
+    assert _compare((x > y), val, der)
+
+
+#################################
+
 
 
 def test_le_constants():

@@ -68,6 +68,9 @@ class Dual:
         """
         if np.ndim(X) != 1:
             raise Exception(f"array must be 1-dimensional")
+        if len(X)==1:
+            return Dual(X[0],1)
+
         I = np.identity(len(X))
         return iter(Dual(x, I[i]) for i, x in enumerate(X))
 
@@ -120,11 +123,13 @@ class Dual:
     def __radd__(self, other):
         return self + other
 
-    def __sub__(self):
-        ...
+    def __sub__(self,other):
+        if other := self._compatible(other, "-"):
+            return Dual(self.val - other.val, self.der - other.der)
 
-    def __rsub__(self):
-        ...
+    def __rsub__(self,other):
+        if other := self._compatible(other, "-"):
+            return Dual(other.val - self.val, other.der-self.der)
 
     def __mul__(self, other):
         if other := self._compatible(other, "*"):
@@ -134,11 +139,15 @@ class Dual:
     def __rmul__(self, other):
         return self * other
 
-    def __truediv__(self):
-        ...
+    def __truediv__(self,other):
+        if other := self._compatible(other, "/"):
+            return Dual(self.val/other.val,
+                        (other.val*self.der-self.val*other.der)/(other.val**2))
 
-    def __rtruediv__(self):
-        ...
+    def __rtruediv__(self,other):
+        if other := self._compatible(other, "/"):
+            return Dual(other.val/self.val,
+                        (self.val*other.der-other.val*self.der)/(self.val**2))
 
     def __pow__(self, other):
         if other := self._compatible(other, "**"):
@@ -149,14 +158,25 @@ class Dual:
         if other := self._compatible(other, "**"):
             return other ** self
 
+
+### Hanwen_M2
+
     def __neg__(self):
-        ...
+        # Returns the negative of self
+        return Dual(-self.val, -self.der)
 
-    def __lt__(self):
-        ...
+    def __lt__(self,other):
+        # Returns True self if self less than other
+        # Returns True self if self greater than other
+        if other := self._compatible(other, "<"):
+            return self.val < other.val, self.der < other.der
 
-    def __gt__(self):
-        ...
+    def __gt__(self,other):
+        # Returns True self if self greater than other
+        if other := self._compatible(other, ">"):
+            return self.val > other.val, self.der > other.der
+###
+
 
     def __le__(self, other):
         if other := self._compatible(other, "<="):
