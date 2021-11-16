@@ -44,6 +44,27 @@ def test_dual_from_array(vals):
 
 
 # Add tests for arithmetic operations
+def test_pow_constants():
+    x = ad.Dual.constant(2)
+    y = ad.Dual.constant(3)
+    assert _equal(x**y, 8, 0)
+
+def test_pow_dual_constant():
+    x = ad.Dual(2, 2)
+    assert _equal(x**3, 8, 24)
+    
+def test_pow_constant_dual():
+    x = ad.Dual(4, 2)
+    assert _equal(3**x, 81, 177.97519076)
+    
+def test_pow_dual_dual():
+    x = ad.Dual(4, 2)
+    assert _equal(x**x, 256, 1221.78271289)
+    
+def test_pow_multi():
+    x, y = ad.Dual.from_array([2, 2])
+    assert _equal(x**y, 4, 2.77258872)
+    
 def test_sub_constants():
     x = ad.Dual.constant(1)    # two constants
     y = ad.Dual.constant(2)
@@ -93,7 +114,6 @@ def test_truediv_multivariate():
     z = 2
     assert _equal(x/z,3,[1/2,0.0])    # one multivariate and one number
 
-######################## Hanwen_M2
 # Add more comparison tests (e.g. <, >)
 def test_neg_constants():
     x = ad.Dual.constant(2)

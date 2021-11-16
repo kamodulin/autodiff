@@ -82,7 +82,6 @@ class Dual:
         Parameters
         ----------
         other : Dual
-
         Returns
         -------
         out : Dual, ArithmeticError, or TypeError
@@ -150,11 +149,14 @@ class Dual:
             return Dual(other.val/self.val,
                         (self.val*other.der-other.val*self.der)/(self.val**2))
 
-    def __pow__(self):
-        ...
+    def __pow__(self, other):
+        if other := self._compatible(other, "**"):
+            der_comp_2 = other.der*np.log(self.val) + other.val*(self.der/self.val)
+            return Dual(self.val ** other.val, (self.val ** other.val)*der_comp_2)
 
-    def __rpow__(self):
-        ...
+    def __rpow__(self, other):
+        if other := self._compatible(other, "**"):
+            return other ** self
 
 
 ### Hanwen_M2
