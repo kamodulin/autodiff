@@ -88,22 +88,23 @@ def test_log_constant(val):
     out = ad.log(x)
     assert _equal(out, np.log(val), 0)
     
-@pytest.mark.parametrize("val", [0.7, -64])
+@pytest.mark.parametrize("val", [0.7, 64])
 @pytest.mark.parametrize("der", [-2, 4.2])
 def test_log_univariate(val, der):
     x = ad.Dual(val, der)
     out = ad.log(x)
     assert _equal(out, np.log(val), der / val)
     
-@pytest.mark.parametrize("val", [0.7, -64])
+@pytest.mark.parametrize("val", [0.7, 64])
 @pytest.mark.parametrize("der", [np.array([-3.4, 6]), np.array([-1, 24.2])])
 def test_log_multivariate(val, der):
     x = ad.Dual(val, der)
-    out = ad.tan(x)
+    out = ad.log(x)
     assert _equal(out, np.log(val), der / val)
-    
-def test_log_undefined():
-    x = ad.Dual(0)
+
+@pytest.mark.parametrize("val", [0, -2.4, -11])    
+def test_log_undefined(val):
+    x = ad.Dual(val)
     with pytest.raises(ValueError):
         ad.log(x)
 

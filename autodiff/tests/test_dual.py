@@ -63,7 +63,9 @@ def test_pow_dual_dual():
     
 def test_pow_multi():
     x, y = ad.Dual.from_array([2, 2])
-    assert _equal(x**y, 4, 4*(1*np.log(2)+2*(1/2))) 
+    val = x.val ** y.val
+    der = val * (y.der * np.log(x.val) + y.val * x.der / x.val)
+    assert _equal(x**y, val, der)
     
 def test_sub_constants():
     x = ad.Dual.constant(1)    # two constants
@@ -161,7 +163,7 @@ def test_lt_multivariate():
 def test_gt_constants():
     x = ad.Dual.constant(1)
     y = ad.Dual.constant(2)
-    val = True
+    val = False
     der = False
     assert _compare((x > y), val, der)
 
