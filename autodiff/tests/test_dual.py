@@ -35,7 +35,27 @@ def test_dual_from_array(vals):
 
 
 # Add tests for arithmetic operations
+def test_pow_constants():
+    x = ad.Dual.constant(2)
+    y = ad.Dual.constant(3)
+    assert _equal(x**y, 8, 0)
 
+def test_pow_dual_constant():
+    x = ad.Dual(2, 2)
+    assert _equal(x**3, 8, 24)
+    
+def test_pow_constant_dual():
+    x = ad.Dual(4, 2)
+    assert _equal(3**x, 81, 177.97519076)
+    
+def test_pow_dual_dual():
+    x = ad.Dual(4, 2)
+    assert _equal(x**x, 256, 1221.78271289)
+    
+def test_pow_multi():
+    x, y = ad.Dual.from_array([2, 2])
+    assert _equal(x**y, 4, 2.77258872)
+    
 # Add more comparison tests (e.g. <, >)
 
 
