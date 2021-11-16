@@ -12,7 +12,7 @@ if [[ $# -gt 0 && ${1} != 'pytest' ]]; then
 fi
 
 if [[ $# -gt 1 && ${2} == 'coverage' ]]; then
-	option='--cov=autodiff --cov-report=term-missing'
+	option='--cov=autodiff/src --cov-report=term-missing'
 	if [[ $# -gt 2 ]]; then
 		option=${@:3}
 	fi
@@ -23,4 +23,8 @@ fi
 
 export PYTHONPATH="$PWD"
 # run the tests
-${driver} ${tests[@]}
+if [[ $# -gt 1 && ${2} == 'coverage' ]]; then
+	${driver}
+else
+	${driver} ${tests[@]}
+fi
