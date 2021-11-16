@@ -71,7 +71,7 @@ class Dual:
         if len(X)==1:
             return Dual(X[0],1)
 
-        I = np.identity(len(X))    
+        I = np.identity(len(X))
         return iter(Dual(x, I[i]) for i, x in enumerate(X))
 
     def _compatible(self, other, operand=None):
@@ -156,14 +156,25 @@ class Dual:
     def __rpow__(self):
         ...
 
+
+### Hanwen_M2
+
     def __neg__(self):
-        ...
+        # Returns the negative of self
+        return Dual(-self.val, -self.der)
 
-    def __lt__(self):
-        ...
+    def __lt__(self,other):
+        # Returns True self if self less than other
+        # Returns True self if self greater than other
+        if other := self._compatible(other, "<"):
+            return self.val < other.val, self.der < other.der
 
-    def __gt__(self):
-        ...
+    def __gt__(self,other):
+        # Returns True self if self greater than other
+        if other := self._compatible(other, ">"):
+            return self.val > other.val, self.der > other.der
+###
+
 
     def __le__(self, other):
         if other := self._compatible(other, "<="):

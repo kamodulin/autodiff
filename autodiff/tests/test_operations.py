@@ -103,3 +103,26 @@ def test_exp_multivariate(val, der):
     x = ad.Dual(val, der)
     out = ad.exp(x)
     assert _equal(out, np.exp(val), der*np.exp(val))
+
+## Hanwen Test Operation
+@pytest.mark.parametrize("val", [1])
+def test_sqrt_constant(val):
+    x = ad.Dual.constant(val)
+    out = ad.sqrt(x)
+    assert _equal(out, np.sqrt(val), 0)
+
+
+@pytest.mark.parametrize("val", [0.7])
+@pytest.mark.parametrize("der", [2])
+def test_sqrt_univariate(val, der):
+    x = ad.Dual(val, der)
+    out = ad.sqrt(x)
+    assert _equal(out, np.sqrt(val), 0.5 / np.sqrt(val) * der)
+
+
+@pytest.mark.parametrize("val", [0.7])
+@pytest.mark.parametrize("der", np.array([-3.4, 6]))
+def test_sqrt_multivariate(val, der):
+    x = ad.Dual(val, der)
+    out = ad.sqrt(x)
+    assert _equal(out, np.sqrt(val), 0.5 / np.sqrt(val) * der)

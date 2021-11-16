@@ -21,10 +21,14 @@ def tan(x):
 def exp(x):
     return Dual(np.exp(x.val), np.exp(x.val) * x.der)
 
-
+##
 def log(x):
-    ...
+    if x.val < 0:
+        raise ValueError(f"Derivative of log(x) is undefined for x <0")
+    return Dual(np.log(x.val),  1 / x.val * x.der)
 
 
 def sqrt(x):
-    ...
+    if x.val < 0:
+        raise ValueError(f"Derivative of sqrt(x) is undefined for x <0")
+    return Dual(np.sqrt(x.val), 0.5 / np.sqrt(x.val) * x.der)
