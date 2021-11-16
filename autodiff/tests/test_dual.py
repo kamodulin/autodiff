@@ -55,15 +55,15 @@ def test_pow_dual_constant():
     
 def test_pow_constant_dual():
     x = ad.Dual(4, 2)
-    assert _equal(3**x, 81, 177.97519076)
+    assert _equal(3**x, 81, (81*(2*np.log(3)+4*(0/3))))
     
 def test_pow_dual_dual():
     x = ad.Dual(4, 2)
-    assert _equal(x**x, 256, 1221.78271289)
+    assert _equal(x**x, 256, 256*(2*np.log(4)+4*(2/4)))
     
 def test_pow_multi():
     x, y = ad.Dual.from_array([2, 2])
-    assert _equal(x**y, 4, 2.77258872)
+    assert _equal(x**y, 4, 4*(1*np.log(2)+2*(1/2))) 
     
 def test_sub_constants():
     x = ad.Dual.constant(1)    # two constants
