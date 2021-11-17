@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 tests=(
-    autodiff/tests/test_dual.py
-    autodiff/tests/test_operations.py
+    tests/test_dual.py
+    tests/test_operations.py
 )
 
 test='pytest'
@@ -12,7 +12,7 @@ if [[ $# -gt 0 && ${1} != 'pytest' ]]; then
 fi
 
 if [[ $# -gt 1 && ${2} == 'coverage' ]]; then
-	option='--cov=autodiff/src --cov-report=term-missing'
+	option='--cov=src/autodiff --cov-report=term-missing'
 	if [[ $# -gt 2 ]]; then
 		option=${@:3}
 	fi
@@ -21,7 +21,7 @@ elif [[ $# -gt 1 && ${2} == 'unittest'* ]]; then
     driver="${test} -v"
 fi
 
-export PYTHONPATH="$PWD"
+export PYTHONPATH="$PWD/src/"
 # run the tests
 if [[ $# -gt 1 && ${2} == 'coverage' ]]; then
 	${driver}
