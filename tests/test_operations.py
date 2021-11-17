@@ -82,19 +82,22 @@ def test_tan_derivative_undefined():
     with pytest.raises(ValueError):
         ad.tan(x)
 
+
 @pytest.mark.parametrize("val", [1, 2])
 def test_log_constant(val):
     x = ad.Dual.constant(val)
     out = ad.log(x)
     assert _equal(out, np.log(val), 0)
-    
+
+
 @pytest.mark.parametrize("val", [0.7, 64])
 @pytest.mark.parametrize("der", [-2, 4.2])
 def test_log_univariate(val, der):
     x = ad.Dual(val, der)
     out = ad.log(x)
     assert _equal(out, np.log(val), der / val)
-    
+
+
 @pytest.mark.parametrize("val", [0.7, 64])
 @pytest.mark.parametrize("der", [np.array([-3.4, 6]), np.array([-1, 24.2])])
 def test_log_multivariate(val, der):
@@ -102,11 +105,13 @@ def test_log_multivariate(val, der):
     out = ad.log(x)
     assert _equal(out, np.log(val), der / val)
 
-@pytest.mark.parametrize("val", [0, -2.4, -11])    
+
+@pytest.mark.parametrize("val", [0, -2.4, -11])
 def test_log_undefined(val):
     x = ad.Dual(val)
     with pytest.raises(ValueError):
         ad.log(x)
+
 
 @pytest.mark.parametrize("val", [1, -6.2])
 def test_exp_constant(val):
@@ -120,7 +125,7 @@ def test_exp_constant(val):
 def test_exp_univariate(val, der):
     x = ad.Dual(val, der)
     out = ad.exp(x)
-    assert _equal(out, np.exp(val), der*np.exp(val))
+    assert _equal(out, np.exp(val), der * np.exp(val))
 
 
 @pytest.mark.parametrize("val", [0.7, -64])
@@ -128,7 +133,8 @@ def test_exp_univariate(val, der):
 def test_exp_multivariate(val, der):
     x = ad.Dual(val, der)
     out = ad.exp(x)
-    assert _equal(out, np.exp(val), der*np.exp(val))
+    assert _equal(out, np.exp(val), der * np.exp(val))
+
 
 ## Hanwen Test Operation
 @pytest.mark.parametrize("val", [1])
@@ -152,3 +158,10 @@ def test_sqrt_multivariate(val, der):
     x = ad.Dual(val, der)
     out = ad.sqrt(x)
     assert _equal(out, np.sqrt(val), 0.5 / np.sqrt(val) * der)
+
+
+@pytest.mark.parametrize("val", [-2.4, -11])
+def test_sqrt_undefined(val):
+    x = ad.Dual(val)
+    with pytest.raises(ValueError):
+        ad.sqrt(x)
