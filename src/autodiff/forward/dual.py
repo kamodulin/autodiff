@@ -156,7 +156,7 @@ class Dual:
             if self.val < 0 and (other != int(other)): # complex result
                 raise ValueError(f"{self.val} cannot be raised to the power of {other}; only integer powers are allowed if base is negative")
             elif self.val == 0 and other < 1:
-                raise ValueError(f"0.0 cannot be raised to a negative power")
+                raise ZeroDivisionError(f"0.0 cannot be raised to a negative power")
         elif isinstance(other, Dual):
             if self.val <= 0: # cannot take log of negative number
                 raise ValueError(f"{self.val} cannot be raised to the power of {other.val}; log is undefined for x = {self.val}")
