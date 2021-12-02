@@ -370,15 +370,29 @@ class Dual:
         >>> Dual(3, [1, 2]) ** Dual(2, [3, 4])
         Dual(9, array([35.66253179, 51.55004239]))
         """
-        if other := self._compatible(other, "**"):
+        if isinstance(other, (int, float)):
+            if self.val < 0 and (other != int(other)): # complex result
+                raise ValueError(f"{self.val} cannot be raised to the power of {other}; only integer powers are allowed if base is negative")
+            elif self.val == 0 and other < 1:
+                raise ZeroDivisionError(f"0.0 cannot be raised to a negative power")
+        elif isinstance(other, Dual):
+            if self.val <= 0: # cannot take log of negative number
+                raise ValueError(f"{self.val} cannot be raised to the power of {other.val}; log is undefined for x = {self.val}")
+        try:
             der_comp_2 = other.der * np.log(
                 self.val) + other.val * (self.der / self.val)
-            return Dual(self.val**other.val,
-                        (self.val**other.val) * der_comp_2)
+            return Dual(self.val ** other.val,
+                        (self.val ** other.val) * der_comp_2)
+        except AttributeError:
+            return Dual(self.val ** other, other * self.val ** (other - 1) * self.der)
 
     def __rpow__(self, other):
-        if other := self._compatible(other, "**"):
-            return other**self
+        if other <= 0:
+            raise ValueError(f"{other} cannot be raised to the power of {self.val}; log is undefined for x = {other}")
+        
+        val = other ** self.val
+        der = val * np.log(other) * self.der
+        return Dual(val, der)
 
     def __neg__(self):
         return Dual(-self.val, -self.der)
