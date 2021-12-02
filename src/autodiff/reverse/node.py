@@ -13,6 +13,36 @@ class Node:
             self.der = sum(w*node.grad() for w, node in self.children)
         return self.der
 
+    # Experimental grad(): calls 
+    # Params: variables with which to take the derivatives 
+    # Returns: list of derivatives
+    # Sample use case: f.grad(x,y,z)
+    
+    # def grad(self, *args):
+    #     if len(args) == 0:
+    #         return [1.0]
+    #     grads = []
+    #     for to in args:
+    #         grads.append(self._gradrecur(to))
+    #     return grads
+
+    # Experimental feature
+    # def _gradrecur(self, wrt):
+    #     if wrt is self:
+    #         return 1.0
+    #     if wrt.der is None:
+    #         wrt.der = sum(w*self._gradrecur(node) for w, node in wrt.children)
+    #     return wrt.der
+
+    @staticmethod
+    def zero_grad(*args):
+        for arg in args:
+            try:
+                arg.children = []
+                arg.der = None
+            except AttributeError:
+                raise ValueError(f'Cannot set gradient to zero for type {self.__class__.__name__}')
+
     @staticmethod
     def constant(val):
         node = Node(val)
@@ -90,10 +120,3 @@ class Node:
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.val})"
-
-# x,y,z = Node.from_array([1,2,3])
-# f = 3/(x+2)*(9/z) + 3/(x/ (1*x - z/(x-2)*(3+y) + x/1 + x/(2*(1-z)*(x+1)) - y/(6*(2-x)) + 7 + (3-y)))/x/y/3
-
-# print(x.grad())
-# print(y.grad())
-# print(z.grad())
