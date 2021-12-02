@@ -1,6 +1,6 @@
 import numpy as np
 
-from dual import Dual
+from .dual import Dual
 
 __all__ = [
     "sin", "cos", "tan", "sinh", "cosh", "tanh", "arcsin", "arccos", "arctan",
