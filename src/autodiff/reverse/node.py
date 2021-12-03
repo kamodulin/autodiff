@@ -66,6 +66,7 @@ class Node:
             return other
         raise TypeError(f"unsupported operand type(s) for {operand}: '{type(self).__name__}' and '{type(other).__name__}'")
 
+
     def _addChildren(self, new_weight, new_child):
         if self.children is not None:
             self.children.append((new_weight, new_child))
