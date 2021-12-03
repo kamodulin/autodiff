@@ -29,3 +29,44 @@ def test_sin_multichildren(val, der, child_val):
     out = ad.sin(x)
     assert _equal(out, np.sin(val), np.cos(val) + der, np.array([x.grad()]))
 
+
+@pytest.mark.parametrize("val", [1, -6.2])
+def test_sinh_constant(val):
+    x = ad.Node.constant(val)
+    out = ad.sinh(x)
+    assert _equal(out, np.sinh(val), 0, np.array([x.grad()]))
+
+
+@pytest.mark.parametrize("val",[0.7,-64])
+def test_sinh_variable(val):
+    x = ad.Node(val)
+    out = ad.sinh(x)
+    assert _equal(out, np.sinh(val), np.cosh(val), np.array([x.grad()]))
+
+
+@pytest.mark.parametrize("val", [1, -6.2])
+def test_cosh_constant(val):
+    x = ad.Node.constant(val)
+    out = ad.cosh(x)
+    assert _equal(out, np.cosh(val), 0, np.array([x.grad()]))
+
+
+@pytest.mark.parametrize("val",[0.7,-64])
+def test_cosh_variable(val):
+    x = ad.Node(val)
+    out = ad.cosh(x)
+    assert _equal(out, np.cosh(val), np.sinh(val), np.array([x.grad()]))
+
+
+@pytest.mark.parametrize("val", [1, -6.2])
+def test_cosh_constant(val):
+    x = ad.Node.constant(val)
+    out = ad.tanh(x)
+    assert _equal(out, np.tanh(val), 0, np.array([x.grad()]))
+
+
+@pytest.mark.parametrize("val",[0.7,-64])
+def test_cosh_variable(val):
+    x = ad.Node(val)
+    out = ad.tanh(x)
+    assert _equal(out, np.tanh(val), 1-(np.tanh(val))**2, np.array([x.grad()]))

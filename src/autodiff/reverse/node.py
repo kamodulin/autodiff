@@ -59,7 +59,7 @@ class Node:
 
         return iter(Node(x) for x in X)
 
-    def _isConstant(self,other):
+    def _isConstant(self, other, operand = None):
         if isinstance(other, (int, float)):
             return Node.constant(other)
         elif isinstance(other, Node):
@@ -118,6 +118,38 @@ class Node:
             self._addChildren(-other.val/(self.val**2),child)
             other._addChildren(1/self.val,child)
             return child
+
+    def __neg__(self):
+        if self.children == None:
+            child = Node.constant(-self.val)
+        else:
+            child = Node(-self.val)
+            self._addChildren(-1.0,child)
+        return child
+
+    def __lt__(self, other):
+        if other := self._isConstant(other):
+            return self.val < other.val
+
+    def __gt__(self, other):
+        if other := self._isConstant(other):
+            return self.val > other.val
+
+    def __le__(self, other):
+        if other := self._isConstant(other):
+            return self.val <= other.val
+
+    def __ge__(self, other):
+        if other := self._isConstant(other):
+            return self.val >= other.val
+
+    def __eq__(self, other):
+        if other := self._isConstant(other):
+            return self.val == other.val, self.der == other.der
+
+    def __ne__(self, other):
+        if other := self._isConstant(other):
+            return self.val != other.val, self.der != other.der
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.val})"
