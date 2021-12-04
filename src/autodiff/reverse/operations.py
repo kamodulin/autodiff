@@ -67,6 +67,17 @@ def sqrt(x):
     x._addChildren(0.5/np.sqrt(x.val),child)
     return child
 
+
+def logistic(x):
+    try:
+        g = lambda z: 1/(1+np.exp(-z))
+        child = Node(g(x.val))
+        x._addChildren(g(x.val) * (1 - g(x.val)), child)
+        return child
+    except AttributeError:
+        return 1/(1+np.exp(-x))
+
+
 def sinh(x):
     try:
         child = Node(np.sinh(x.val))
@@ -117,17 +128,3 @@ def arctan(x):
     except AttributeError:
         return np.arcsin(x)
         
-# Logistic :refer to https://en.wikipedia.org/wiki/Logistic_function
-
-def logistic(x, L=1, k=1, x0=0):
-# logistics(x,L=2,k=1,x0=5 )
-    def log_helper(x, L=1, k=1, x0=0):
-        return L / (1 + np.exp(-k * (x - x0)))
-
-    temp_log= log_helper(x.val, L, k, x0)
-    child = Node(temp_log)
-    x._addChildtren = ([k * temp * (1 - temp/L)],child)
-    return new_node
-
-
-
