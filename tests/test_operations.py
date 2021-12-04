@@ -164,22 +164,3 @@ def test_sqrt_undefined(val):
     x = ad.Dual(val)
     with pytest.raises(ValueError):
         ad.sqrt(x)
-
-# Test for Inverse trig function
-@pytest.mark.parametrize("val", [-0.5, -1])
-def test_arcsin_univariate(val,der):
-    x = ad.Dual(val, der)
-    out = ad.arcsin(x)
-    assert _equal(out, np.arcsin(val), 1 / np.sqrt(1 - val ** 2) * der)
-
-@pytest.mark.parametrize("val", [-0.5, -1])
-def test_arccos_univariate(val,der):
-    x = ad.Dual(val, der)
-    out = ad.arccos(x)
-    assert _equal(out, np.arccos(val), -1 / np.sqrt(1 - val ** 2) * der)
-
-@pytest.mark.parametrize("val", [-0.5])
-def test_arctan_univariate(val,der):
-    x = ad.Dual(val, der)
-    out = ad.arctan(x)
-    assert _equal(out, np.arctan(val), 1 / (1 + val ** 2) * der)
