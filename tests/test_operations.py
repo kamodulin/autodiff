@@ -267,6 +267,10 @@ def test_arcsin_undefined(val,der):
     with pytest.raises(ValueError):
         ad.arcsin(x)
 
+@pytest.mark.parametrize("val", [0.5,0.1,-0.1,-0.99,0])
+def test_arcsin_number(val):
+    out = ad.arcsin(val)
+    assert pytest.approx(out,np.arcsin(val))
 
 @pytest.mark.parametrize("val", [0.5,0.1,-0.1,-0.99,0])
 def test_arccos_constant(val):
@@ -297,6 +301,11 @@ def test_arccos_undefined(val,der):
     with pytest.raises(ValueError):
         ad.arccos(x)
 
+@pytest.mark.parametrize("val", [0.5,0.1,-0.1,-0.99,0])
+def test_arccos_number(val):
+    out = ad.arccos(val)
+    assert pytest.approx(out,np.arccos(val))
+
 @pytest.mark.parametrize("val", [0.7, 64, -0.3, -10, 11.4])
 def test_arctan_constant(val):
     x = ad.Dual.constant(val)
@@ -318,6 +327,11 @@ def test_arctan_multivariate(val,der):
     out = ad.arctan(x)
     assert _equal(out,np.arctan(val),der/(1+val**2))
 
+@pytest.mark.parametrize("val", [0.7, 64, -0.3, -10, 11.4])
+def test_arctan_number(val):
+    out = ad.arctan(val)
+    assert pytest.approx(out,np.arctan(val))
+
 
 @pytest.mark.parametrize("val", [0.7, 64, -0.5, 10, -10])
 def test_logistic_constant(val):
@@ -326,6 +340,11 @@ def test_logistic_constant(val):
     out = ad.logistic(x)
     assert _equal(out,g(val),0)
 
+@pytest.mark.parametrize("val", [0.7, 64, -0.5, 10, -10])
+def test_logistic_numbers(val):
+    g = lambda z: 1 / (1 + np.exp(-z))
+    out = ad.logistic(val)
+    assert pytest.approx(out,g(val))
 
 @pytest.mark.parametrize("val", [0.7, 64, -0.3, -10, 11.4])
 @pytest.mark.parametrize("der", [2, 0, -1, 25.3, -19.1])
