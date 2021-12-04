@@ -19,4 +19,5 @@ def _compare(comparison, val, der):
 
 def _compare_node(comparison, val, der, eval_der):
     x = adr.Node(comparison)
-    return _equal(x,val,der,eval_der)
+
+    return (np.isclose(x.val, val) and np.isclose(eval_der, der).all()) if eval_der is not None else (np.isclose(x.val, val) and eval_der == None)
