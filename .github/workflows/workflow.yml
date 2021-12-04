@@ -26,7 +26,7 @@ jobs:
       run: |
         pip install pytest
         pip install pytest-cov
-        ./tests/run_tests.sh pytest coverage --cov=src/autodiff --cov-report=xml 
+        bash ./tests/run_tests.sh pytest coverage --cov=src/autodiff --cov-report=xml 
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
