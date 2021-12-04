@@ -164,6 +164,78 @@ def test_sqrt_undefined(val):
     x = ad.Dual(val)
     with pytest.raises(ValueError):
         ad.sqrt(x)
+        
+@pytest.mark.parametrize("val", [0.7, -64])
+@pytest.mark.parametrize("der", [-2, 4.2])
+def test_sinh_univariate(val, der):
+    x = ad.Dual(val, der)
+    out = ad.sinh(x)
+    out_val = np.sinh(val)
+    out_der = np.cosh(val) * der
+    assert _equal(out, out_val, out_der)
+
+@pytest.mark.parametrize("val", [0.7, -64])
+@pytest.mark.parametrize("der", [np.array([-3.4, 6]), np.array([-1, 24.2])])
+def test_sinh_multivariate(val, der):
+    x = ad.Dual(val, der)
+    out = ad.sinh(x)
+    out_val = np.sinh(val)
+    out_der = np.cosh(val) * der
+    assert _equal(out, out_val, out_der)
+    
+@pytest.mark.parametrize("val", [1, 6.2])
+def test_sinh_constant(val):
+    x = ad.Dual.constant(val)
+    out = ad.sinh(x)
+    assert _equal(out, np.sinh(val), 0)
+    
+@pytest.mark.parametrize("val", [0.7, -64])
+@pytest.mark.parametrize("der", [-2, 4.2])
+def test_cosh_univariate(val, der):
+    x = ad.Dual(val, der)
+    out = ad.cosh(x)
+    out_val = np.cosh(val)
+    out_der = np.sinh(val) * der
+    assert _equal(out, out_val, out_der)
+
+@pytest.mark.parametrize("val", [0.7, -64])
+@pytest.mark.parametrize("der", [np.array([-3.4, 6]), np.array([-1, 24.2])])
+def test_cosh_multivariate(val, der):
+    x = ad.Dual(val, der)
+    out = ad.cosh(x)
+    out_val = np.cosh(val)
+    out_der = np.sinh(val) * der
+    assert _equal(out, out_val, out_der)
+    
+@pytest.mark.parametrize("val", [1, 6.2])
+def test_cosh_constant(val):
+    x = ad.Dual.constant(val)
+    out = ad.cosh(x)
+    assert _equal(out, np.cosh(val), 0)
+    
+@pytest.mark.parametrize("val", [0.7, -64])
+@pytest.mark.parametrize("der", [-2, 4.2])
+def test_tanh_univariate(val, der):
+    x = ad.Dual(val, der)
+    out = ad.tanh(x)
+    out_val = np.tanh(val)
+    out_der = (1 - np.tanh(val)**2) * der
+    assert _equal(out, out_val, out_der)
+
+@pytest.mark.parametrize("val", [0.7, -64])
+@pytest.mark.parametrize("der", [np.array([-3.4, 6]), np.array([-1, 24.2])])
+def test_tanh_multivariate(val, der):
+    x = ad.Dual(val, der)
+    out = ad.tanh(x)
+    out_val = np.tanh(val)
+    out_der = (1 - np.tanh(val)**2) * der
+    assert _equal(out, out_val, out_der)
+    
+@pytest.mark.parametrize("val", [1, 6.2])
+def test_tanh_constant(val):
+    x = ad.Dual.constant(val)
+    out = ad.tanh(x)
+    assert _equal(out, np.tanh(val), 0)
 
 
 @pytest.mark.parametrize("val", [0.5,0.1,-0.1,-0.99,0])
