@@ -67,6 +67,9 @@ def tanh(x):
 
 def arcsin(x):
     try:
+        if abs(x.val) >= 1:
+            raise ValueError(
+                f"Derivative of arcsin(x) is undefined for x = {x.val}")
         child = Node(np.arcsin(x.val))
         x._addChildren((1 / np.sqrt(1 - x.val**2)), child)
         return child
@@ -76,11 +79,14 @@ def arcsin(x):
 
 def arccos(x):
     try:
+        if abs(x.val) >= 1:
+            raise ValueError(
+                f"Derivative of arcsin(x) is undefined for x = {x.val}")
         child = Node(np.arccos(x.val))
         x._addChildren((-1 / np.sqrt(1 - x.val**2)), child)
         return child
     except AttributeError:
-        return np.arcsin(x)
+        return np.arccos(x)
 
 
 def arctan(x):
@@ -89,7 +95,7 @@ def arctan(x):
         x._addChildren((1 / (1 + x.val**2)), child)
         return child
     except AttributeError:
-        return np.arcsin(x)
+        return np.arctan(x)
 
 
 def exp(x):
