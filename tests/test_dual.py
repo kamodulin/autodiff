@@ -291,10 +291,12 @@ def test_pow_invalid(val1, val2):
         y = ad.Dual.constant(val2)
         _ = x**y
 
+    with pytest.raises(ValueError):
         x = ad.Dual.constant(val1)
         y = val2
         _ = x**y
 
+    with pytest.raises(ValueError):
         x = ad.Dual.constant(val1)
         y = ad.Dual.constant(val2)
         _ = x**y
