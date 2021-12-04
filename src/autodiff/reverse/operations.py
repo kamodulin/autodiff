@@ -66,3 +66,12 @@ def sqrt(x):
     child = Node(np.sqrt(x.val))
     x._add_child(0.5/np.sqrt(x.val),child)
     return child
+
+def logistic(x):
+    try:
+        g = lambda z: 1/(1+np.exp(-z))
+        child = Node(g(x.val))
+        x._addChildren(g(x.val) * (1 - g(x.val)), child)
+        return child
+    except AttributeError:
+        return 1/(1+np.exp(-x))
