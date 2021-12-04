@@ -30,7 +30,7 @@ def test_sin_variable(val):
 def test_sin_multichildren(val, der, child_val):
     x = ad.Node(val)
     child = ad.Node(child_val)
-    x._add_child(der, child)
+    x._addChildren(der, child)
     out = ad.sin(x)
     der = np.cos(val) + der
     eval_der = np.array([x.grad()])

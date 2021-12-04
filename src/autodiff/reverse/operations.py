@@ -10,7 +10,7 @@ def sin(x):
         return np.sin(x)
 
     child = Node(np.sin(x.val))
-    x._add_child(np.cos(x.val),child)
+    x._addChildren(np.cos(x.val),child)
     return child
 
 def cos(x):
@@ -18,7 +18,7 @@ def cos(x):
         return np.cos(x)
 
     child = Node(np.cos(x.val))
-    x._add_child(-np.sin(x.val),child)
+    x._addChildren(-np.sin(x.val),child)
     return child
 
 def tan(x):
@@ -29,7 +29,7 @@ def tan(x):
         raise ValueError(f"Derivative of tan(x) is undefined for x = {x.val}")
 
     child = Node(np.tan(x.val))
-    x._add_child((1/(np.cos(x.val)**2)),child)
+    x._addChildren((1/(np.cos(x.val)**2)),child)
     return child
 
 def exp(x):
@@ -37,7 +37,7 @@ def exp(x):
         return np.exp(x)
 
     child = Node(np.exp(x.val))
-    x._add_child(np.exp(x.val),child)
+    x._addChildren(np.exp(x.val),child)
     return child
 
 
@@ -51,7 +51,7 @@ def log(x):
         raise ValueError(f"Log of x is undefined for x = {x.val}")
     
     child = Node(np.log(x.val))
-    x._add_child((1/x.val),child)
+    x._addChildren((1/x.val),child)
     return child
 
 def sqrt(x):
@@ -64,5 +64,5 @@ def sqrt(x):
         raise ValueError(f"Derivative of sqrt(x) is undefined for x < 0")
 
     child = Node(np.sqrt(x.val))
-    x._add_child(0.5/np.sqrt(x.val),child)
+    x._addChildren(0.5/np.sqrt(x.val),child)
     return child
