@@ -2,7 +2,7 @@ import numpy as np
 
 from .node import Node
 
-__all__ = ["sin", "cos", "tan", "exp", "log", "sqrt","sinh","cosh","tanh"]
+__all__ = ["sin", "cos", "tan", "exp", "log", "sqrt","sinh","cosh","tanh","arcsin","arccos","arctan","logistic"]
 
 
 def sin(x):
@@ -90,3 +90,44 @@ def tanh(x):
         return child
     except AttributeError:
         return np.tanh(x)
+        
+        
+# Inverse trig functions:
+def arcsin(x):
+    try:
+        child = Node(np.arcsin(x.val))
+        x._addChildren((1 / np.sqrt(1 - x.val ** 2)),child)
+        return child
+    except AttributeError:
+        return np.arcsin(x)
+        
+def arccos(x):
+    try:
+        child = Node(np.arccos(x.val))
+        x._addChildren((-1 / np.sqrt(1 - x.val ** 2)),child)
+        return child
+    except AttributeError:
+        return np.arcsin(x)
+        
+def arctan(x):
+    try:
+        child = Node(np.arctan(x.val))
+        x._addChildren((1 / (1 + x.val ** 2)),child)
+        return child
+    except AttributeError:
+        return np.arcsin(x)
+        
+# Logistic :refer to https://en.wikipedia.org/wiki/Logistic_function
+
+def logistic(x, L=1, k=1, x0=0):
+# logistics(x,L=2,k=1,x0=5 )
+    def log_helper(x, L=1, k=1, x0=0):
+        return L / (1 + np.exp(-k * (x - x0)))
+
+    temp_log= log_helper(x.val, L, k, x0)
+    child = Node(temp_log)
+    x._addChildtren = ([k * temp * (1 - temp/L)],child)
+    return new_node
+
+
+

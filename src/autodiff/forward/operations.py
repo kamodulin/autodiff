@@ -33,3 +33,21 @@ def sqrt(x):
     if x.val < 0:
         raise ValueError(f"Derivative of sqrt(x) is undefined for x < 0")
     return Dual(np.sqrt(x.val), 0.5 / np.sqrt(x.val) * x.der)
+
+
+# Inverse trig functions:
+def arcsin(x):
+    der = 1 / np.sqrt(1 - x.val ** 2) * x.der
+    val = np.arcsin(x.val)
+    return Dual(val, der)
+        
+def arccos(x):
+    der = -1 / np.sqrt(1 - x.val ** 2) * x.der
+    val = np.arccos(x.val)
+    return Dual(val, der)
+        
+def arctan(x):
+    der = 1 / (1 + x.val ** 2) * x.der
+    val = np.arctan(x.val)
+    return Dual(val, der)
+        

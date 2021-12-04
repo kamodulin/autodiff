@@ -70,3 +70,23 @@ def test_cosh_variable(val):
     x = ad.Node(val)
     out = ad.tanh(x)
     assert _equal(out, np.tanh(val), 1-(np.tanh(val))**2, np.array([x.grad()]))
+
+
+# Test for Inverse trig function
+@pytest.mark.parametrize("val",[-0.5])
+def test_arcsin_variable(val):
+    x = ad.Node(val)
+    out = ad.arcsin(x)
+    assert _equal(out, np.arcsin(val), 1 / np.sqrt(1 - val ** 2), np.array([x.grad()]))
+
+@pytest.mark.parametrize("val",[-0.5])
+def test_arccos_variable(val):
+    x = ad.Node(val)
+    out = ad.arccos(x)
+    assert _equal(out, np.arccos(val), -1 / np.sqrt(1 - val ** 2), np.array([x.grad()]))
+
+@pytest.mark.parametrize("val",[-0.5])
+def test_acrtan_variable(val):
+    x = ad.Node(val)
+    out = ad.arctan(x)
+    assert _equal(out, np.arctan(val), 1 / (1 + val ** 2), np.array([x.grad()]))
