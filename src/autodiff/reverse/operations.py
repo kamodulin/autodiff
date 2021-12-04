@@ -2,7 +2,7 @@ import numpy as np
 
 from .node import Node
 
-__all__ = ["sin", "cos", "tan", "exp", "log", "sqrt"]
+__all__ = ["sin", "cos", "tan", "exp", "log", "sqrt","sinh","cosh","tanh"]
 
 
 def sin(x):
@@ -66,3 +66,27 @@ def sqrt(x):
     child = Node(np.sqrt(x.val))
     x._addChildren(0.5/np.sqrt(x.val),child)
     return child
+
+def sinh(x):
+    try:
+        child = Node(np.sinh(x.val))
+        x._addChildren(np.cosh(x.val),child)
+        return child
+    except AttributeError:
+        return np.sinh(x)
+
+def cosh(x):
+    try:
+        child = Node(np.cosh(x.val))
+        x._addChildren(np.sinh(x.val),child)
+        return child
+    except AttributeError:
+        return np.cosh(x)
+
+def tanh(x):
+    try:
+        child = Node(np.tanh(x.val))
+        x._addChildren((1 - np.tanh(x.val)**2),child)
+        return child
+    except AttributeError:
+        return np.tanh(x)
