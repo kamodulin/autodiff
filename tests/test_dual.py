@@ -59,157 +59,290 @@ def test_dual_compat_type_error():
         return x + y
 
 
-@pytest.mark.parametrize("val1", [0.7, 64])
+@pytest.mark.parametrize("val1", [0.7, -64])
 @pytest.mark.parametrize("val2", [-2, 4.2])
 def test_add_constant(val1, val2):
-    x = ad.Dual.constant(val1)
-    y = ad.Dual.constant(val2)
-    assert _equal(x + y, val1 + val2, 0)
-
     x = val1
     y = ad.Dual.constant(val2)
     assert _equal(x + y, val1 + val2, 0)
 
+    x = ad.Dual.constant(val1)
+    y = val2
+    assert _equal(x + y, val1 + val2, 0)
 
-@pytest.mark.parametrize("val1", [0.7, 64])
+    x = ad.Dual.constant(val1)
+    y = ad.Dual.constant(val2)
+    assert _equal(x + y, val1 + val2, 0)
+
+
+@pytest.mark.parametrize("val1", [0.7, -64])
 @pytest.mark.parametrize("val2", [-2, 4.2])
 @pytest.mark.parametrize("der1", [-3.4, 6])
 @pytest.mark.parametrize("der2", [-1, 5])
 def test_add_univariate(val1, der1, val2, der2):
+    x = val1
+    y = ad.Dual(val2, der2)
+    assert _equal(x + y, val1 + val2, der2)
+
+    x = ad.Dual(val1, der1)
+    y = val2
+    assert _equal(x + y, val1 + val2, der1)
+
     x = ad.Dual(val1, der1)
     y = ad.Dual(val2, der2)
     assert _equal(x + y, val1 + val2, der1 + der2)
 
 
-@pytest.mark.parametrize("val1", [0.7, 64])
+@pytest.mark.parametrize("val1", [0.7, -64])
 @pytest.mark.parametrize("val2", [-2, 4.2])
 @pytest.mark.parametrize("der1", [np.array([-3.4, 6]), np.array([-1, 24.2])])
 @pytest.mark.parametrize("der2", [np.array([-4, 2]), np.array([-1.1, 32])])
 def test_add_multivariate(val1, der1, val2, der2):
+    x = val1
+    y = ad.Dual(val2, der2)
+    assert _equal(x + y, val1 + val2, der2)
+
+    x = ad.Dual(val1, der1)
+    y = val2
+    assert _equal(x + y, val1 + val2, der1)
+
     x = ad.Dual(val1, der1)
     y = ad.Dual(val2, der2)
     assert _equal(x + y, val1 + val2, der1 + der2)
 
 
-@pytest.mark.parametrize("val1", [0.7, 64])
+@pytest.mark.parametrize("val1", [0.7, -64])
+@pytest.mark.parametrize("val2", [-2, 4.2])
+def test_sub_constant(val1, val2):
+    x = val1
+    y = ad.Dual.constant(val2)
+    assert _equal(x - y, val1 - val2, 0)
+
+    x = ad.Dual.constant(val1)
+    y = val2
+    assert _equal(x - y, val1 - val2, 0)
+
+    x = ad.Dual.constant(val1)
+    y = ad.Dual.constant(val2)
+    assert _equal(x - y, val1 - val2, 0)
+
+
+@pytest.mark.parametrize("val1", [0.7, -64])
+@pytest.mark.parametrize("val2", [-2, 4.2])
+@pytest.mark.parametrize("der1", [-3.4, 6])
+@pytest.mark.parametrize("der2", [-1, 5])
+def test_sub_univariate(val1, der1, val2, der2):
+    x = val1
+    y = ad.Dual(val2, der2)
+    assert _equal(x - y, val1 - val2, 0 - der2)
+
+    x = ad.Dual(val1, der1)
+    y = val2
+    assert _equal(x - y, val1 - val2, der1 - 0)
+
+    x = ad.Dual(val1, der1)
+    y = ad.Dual(val2, der2)
+    assert _equal(x - y, val1 - val2, der1 - der2)
+
+
+@pytest.mark.parametrize("val1", [0.7, -64])
+@pytest.mark.parametrize("val2", [-2, 4.2])
+@pytest.mark.parametrize("der1", [np.array([-3.4, 6]), np.array([-1, 24.2])])
+@pytest.mark.parametrize("der2", [np.array([-4, 2]), np.array([-1.1, 32])])
+def test_sub_multivariate(val1, der1, val2, der2):
+    x = val1
+    y = ad.Dual(val2, der2)
+    assert _equal(x - y, val1 - val2, 0 - der2)
+
+    x = ad.Dual(val1, der1)
+    y = val2
+    assert _equal(x - y, val1 - val2, der1 - 0)
+
+    x = ad.Dual(val1, der1)
+    y = ad.Dual(val2, der2)
+    assert _equal(x - y, val1 - val2, der1 - der2)
+
+
+@pytest.mark.parametrize("val1", [0.7, -64])
 @pytest.mark.parametrize("val2", [-2, 4.2])
 def test_mul_constant(val1, val2):
+    x = val1
+    y = ad.Dual.constant(val2)
+    assert _equal(x * y, val1 * val2, val1 * 0 + val2 * 0)
+
+    x = ad.Dual.constant(val1)
+    y = val2
+    assert _equal(x * y, val1 * val2, val1 * 0 + val2 * 0)
+
     x = ad.Dual.constant(val1)
     y = ad.Dual.constant(val2)
     assert _equal(x * y, val1 * val2, val1 * 0 + val2 * 0)
 
+
+@pytest.mark.parametrize("val1", [0.7, -64])
+@pytest.mark.parametrize("val2", [-2, 4.2])
+@pytest.mark.parametrize("der1", [-3.4, 6])
+@pytest.mark.parametrize("der2", [-1, 5])
+def test_mul_univariate(val1, der1, val2, der2):
+    x = val1
+    y = ad.Dual(val2, der2)
+    assert _equal(x * y, val1 * val2, val1 * der2 + val2 * 0)
+
+    x = ad.Dual(val1, der1)
+    y = val2
+    assert _equal(x * y, val1 * val2, val1 * 0 + val2 * der1)
+
+    x = ad.Dual(val1, der1)
+    y = ad.Dual(val2, der2)
+    assert _equal(x * y, val1 * val2, val1 * der2 + val2 * der1)
+
+
+@pytest.mark.parametrize("val1", [0.7, -64])
+@pytest.mark.parametrize("val2", [-2, 4.2])
+@pytest.mark.parametrize("der1", [np.array([-3.4, 6]), np.array([-1, 24.2])])
+@pytest.mark.parametrize("der2", [np.array([-4, 2]), np.array([-1.1, 32])])
+def test_mul_multivariate(val1, der1, val2, der2):
+    x = val1
+    y = ad.Dual(val2, der2)
+    assert _equal(x * y, val1 * val2, val1 * der2 + val2 * 0)
+
+    x = ad.Dual(val1, der1)
+    y = val2
+    assert _equal(x * y, val1 * val2, val1 * 0 + val2 * der1)
+
+    x = ad.Dual(val1, der1)
+    y = ad.Dual(val2, der2)
+    assert _equal(x * y, val1 * val2, val1 * der2 + val2 * der1)
+
+
+@pytest.mark.parametrize("val1", [0.7, -64])
+@pytest.mark.parametrize("val2", [-2, 4.2])
+def test_truediv_constant(val1, val2):
     x = val1
     y = ad.Dual.constant(val2)
-    assert _equal(x * y, val1 * val2, val1 * 0 + val2 * 0)
+    assert _equal(x / y, val1 / val2, 0)
+
+    x = ad.Dual.constant(val1)
+    y = val2
+    assert _equal(x / y, val1 / val2, 0)
+
+    x = ad.Dual.constant(val1)
+    y = ad.Dual.constant(val2)
+    assert _equal(x / y, val1 / val2, 0)
+
+
+@pytest.mark.parametrize("val1", [0.7, -64])
+@pytest.mark.parametrize("val2", [-2, 4.2])
+@pytest.mark.parametrize("der1", [-3.4, 6])
+@pytest.mark.parametrize("der2", [-1, 5])
+def test_truediv_univariate(val1, der1, val2, der2):
+    x = val1
+    y = ad.Dual(val2, der2)
+    assert _equal(x / y, val1 / val2, (-val1 * der2) / (val2**2))
+
+    x = ad.Dual(val1, der1)
+    y = val2
+    assert _equal(x / y, val1 / val2, (der1 * val2) / (val2**2))
+
+    x = ad.Dual(val1, der1)
+    y = ad.Dual(val2, der2)
+    assert _equal(x / y, val1 / val2, (val2 * der1 - val1 * der2) / (val2**2))
+
+
+@pytest.mark.parametrize("val1", [0.7, -64])
+@pytest.mark.parametrize("val2", [-2, 4.2])
+@pytest.mark.parametrize("der1", [np.array([-3.4, 6]), np.array([-1, 24.2])])
+@pytest.mark.parametrize("der2", [np.array([-4, 2]), np.array([-1.1, 32])])
+def test_truediv_multivariate(val1, der1, val2, der2):
+    x = val1
+    y = ad.Dual(val2, der2)
+    assert _equal(x / y, val1 / val2, (-val1 * der2) / (val2**2))
+
+    x = ad.Dual(val1, der1)
+    y = val2
+    assert _equal(x / y, val1 / val2, (der1 * val2) / (val2**2))
+
+    x = ad.Dual(val1, der1)
+    y = ad.Dual(val2, der2)
+    assert _equal(x / y, val1 / val2, (val2 * der1 - val1 * der2) / (val2**2))
+
+
+@pytest.mark.parametrize("val1", [0.7, 64])
+@pytest.mark.parametrize("val2", [-2, 4.2])
+def test_pow_constants(val1, val2):
+    x = val1
+    y = ad.Dual.constant(val2)
+    assert _equal(x**y, val1**val2, 0)
+
+    x = ad.Dual.constant(val1)
+    y = val2
+    assert _equal(x**y, val1**val2, 0)
+
+    x = ad.Dual.constant(val1)
+    y = ad.Dual.constant(val2)
+    assert _equal(x**y, val1**val2, 0)
+
+
+@pytest.mark.parametrize("val1", [-0.7, -64])
+@pytest.mark.parametrize("val2", [-2.1, 4.2])
+def test_pow_invalid(val1, val2):
+    with pytest.raises(ValueError):
+        x = val1
+        y = ad.Dual.constant(val2)
+        _ = x**y
+
+    with pytest.raises(ValueError):
+        x = ad.Dual.constant(val1)
+        y = val2
+        _ = x**y
+
+    with pytest.raises(ValueError):
+        x = ad.Dual.constant(val1)
+        y = ad.Dual.constant(val2)
+        _ = x**y
+
+    with pytest.raises(ZeroDivisionError):
+        x = ad.Dual.constant(0)
+        y = -2.1
+        _ = x**y
 
 
 @pytest.mark.parametrize("val1", [0.7, 64])
 @pytest.mark.parametrize("val2", [-2, 4.2])
 @pytest.mark.parametrize("der1", [-3.4, 6])
 @pytest.mark.parametrize("der2", [-1, 5])
-def test_mul_univariate(val1, der1, val2, der2):
+def test_pow_univariate(val1, der1, val2, der2):
+    x = val1
+    y = ad.Dual(val2, der2)
+    assert _equal(x**y, val1**val2, val1**val2 * np.log(val1) * der2)
+
+    x = ad.Dual(val1, der1)
+    y = val2
+    assert _equal(x**y, val1**val2, val2 * val1**(val2 - 1) * der1)
+
     x = ad.Dual(val1, der1)
     y = ad.Dual(val2, der2)
-    assert _equal(x * y, val1 * val2, val1 * der2 + val2 * der1)
+    int_der = der2 * np.log(val1) + val2 * (der1 / val1)
+    assert _equal(x**y, val1**val2, val1**val2 * int_der)
 
 
 @pytest.mark.parametrize("val1", [0.7, 64])
 @pytest.mark.parametrize("val2", [-2, 4.2])
 @pytest.mark.parametrize("der1", [np.array([-3.4, 6]), np.array([-1, 24.2])])
 @pytest.mark.parametrize("der2", [np.array([-4, 2]), np.array([-1.1, 32])])
-def test_mul_multivariate(val1, der1, val2, der2):
+def test_pow_multivariate(val1, der1, val2, der2):
+    x = val1
+    y = ad.Dual(val2, der2)
+    assert _equal(x**y, val1**val2, val1**val2 * np.log(val1) * der2)
+
+    x = ad.Dual(val1, der1)
+    y = val2
+    assert _equal(x**y, val1**val2, val2 * val1**(val2 - 1) * der1)
+
     x = ad.Dual(val1, der1)
     y = ad.Dual(val2, der2)
-    assert _equal(x * y, val1 * val2, val1 * der2 + val2 * der1)
-
-
-def test_pow_constants():
-    x = ad.Dual.constant(2)
-    y = ad.Dual.constant(3)
-    assert _equal(x**y, 8, 0)
-
-
-def test_pow_dual_constant():
-    x = ad.Dual(2, 2)
-    assert _equal(x**3, 8, 24)
-
-
-def test_pow_constant_dual():
-    x = ad.Dual(4, 2)
-    assert _equal(3**x, 81, (81 * (2 * np.log(3) + 4 * (0 / 3))))
-
-
-def test_pow_dual_dual():
-    x = ad.Dual(4, 2)
-    assert _equal(x**x, 256, 256 * (2 * np.log(4) + 4 * (2 / 4)))
-
-
-def test_pow_multi():
-    x, y = ad.Dual.from_array([2, 2])
-    val = x.val**y.val
-    der = val * (y.der * np.log(x.val) + y.val * x.der / x.val)
-    assert _equal(x**y, val, der)
-
-
-def test_sub_constants():
-    x = ad.Dual.constant(1)  # two constants
-    y = ad.Dual.constant(2)
-    assert _equal(x - y, -1, 0)
-
-
-def test_sub_univariate():
-    x, y = ad.Dual(1, 11), ad.Dual(2, 2)  # two univariate
-    assert _equal(x - y, -1, 9)
-
-    a = 2  # one number and one univariate
-    assert _equal(x - a, -1, 11)
-
-
-def test_sub_multivariate():
-    x, y = ad.Dual.from_array([6, 4])  # two multivariate
-    assert _equal(x - y, 2, [1.0, -1.0])
-
-    z = 2
-    assert _equal(x - z, 4, [1.0, 0.0])  # one multivariate and one number
-
-
-def test_rsub_constants():
-    x = ad.Dual.constant(1)  # number subtract one constants
-    assert _equal(0 - x, -1, 0)
-
-
-def test_rsub_multivariate():
-    x, y = ad.Dual.from_array([6, 4])  # number subtract multivariate
-    assert _equal(0 - x, -6, [-1.0, 0.0])
-
-    z = 2
-    assert _equal(0 - y, -4, [0.0, -1.0])
-
-
-def test_truediv_constants():
-    x = ad.Dual.constant(1)  # two constants
-    y = ad.Dual.constant(2)
-    assert _equal(x / y, 0.5, 0)
-
-    x = 1  # two constants
-    y = ad.Dual.constant(2)
-    assert _equal(x / y, 0.5, 0)
-
-
-def test_truediv_univariate():
-    x, y = ad.Dual(1, 11), ad.Dual(2, 2)  # two univariate
-    assert _equal(x / y, 0.5, 5.0)
-
-    a = 2  # one number and one univariate
-    assert _equal(x / a, 0.5, 11 / 2)
-
-
-def test_truediv_multivariate():
-    x, y = ad.Dual.from_array([6, 4])  # two multivariate
-    assert _equal(x / y, 6 / 4, [1 / 4, -3 / 8])
-
-    z = 2
-    assert _equal(x / z, 3, [1 / 2, 0.0])  # one multivariate and one number
+    int_der = der2 * np.log(val1) + val2 * (der1 / val1)
+    assert _equal(x**y, val1**val2, val1**val2 * int_der)
 
 
 def test_neg_constants():
