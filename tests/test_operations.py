@@ -236,3 +236,110 @@ def test_tanh_constant(val):
     x = ad.Dual.constant(val)
     out = ad.tanh(x)
     assert _equal(out, np.tanh(val), 0)
+
+
+@pytest.mark.parametrize("val", [0.5,0.1,-0.1,-0.99,0])
+def test_arcsin_constant(val):
+    x = ad.Dual.constant(val)
+    out = ad.arcsin(x)
+    assert _equal(out, np.arcsin(val),0)
+
+
+@pytest.mark.parametrize("val", [0.5,0.1,-0.1,-0.99,0])
+@pytest.mark.parametrize("der", [2, 0, -1, 25.3, -19.1])
+def test_arcsin_univariate(val,der):
+    x = ad.Dual(val,der)
+    out = ad.arcsin(x)
+    assert _equal(out, np.arcsin(val), der/(np.sqrt(1-val**2)))
+
+
+@pytest.mark.parametrize("val", [0.1,-0.1,-0.99,0])
+@pytest.mark.parametrize("der", [np.array([-3.4, 6]), np.array([1.2, -22]),np.array([-1, 24.2]),np.array([0, 4.2])])
+def test_arcsin_multivariate(val,der):
+    x = ad.Dual(val,der)
+    out = ad.arcsin(x)
+    assert _equal(out, np.arcsin(val), der/(np.sqrt(1-val**2)))
+
+@pytest.mark.parametrize("val",[1.0001,-1.0001,1.0001,-1.0001])
+@pytest.mark.parametrize("der", [1,0,np.array([-1, 24.2]),np.array([0, 4.2])])
+def test_arcsin_undefined(val,der):
+    x = ad.Dual(val,der)
+    with pytest.raises(ValueError):
+        ad.arcsin(x)
+
+
+@pytest.mark.parametrize("val", [0.5,0.1,-0.1,-0.99,0])
+def test_arccos_constant(val):
+    x = ad.Dual.constant(val)
+    out = ad.arccos(x)
+    assert _equal(out,np.arccos(val),0)
+
+
+@pytest.mark.parametrize("val", [0.5,0.1,-0.1,-0.99,0])
+@pytest.mark.parametrize("der", [2, 0, -1, 25.3, -19.1])
+def test_arccos_univariate(val,der):
+    x = ad.Dual(val,der)
+    out = ad.arccos(x)
+    assert _equal(out,np.arccos(val),-der/(np.sqrt(1 - val**2)))
+
+
+@pytest.mark.parametrize("val", [0.1,-0.1,-0.99,0])
+@pytest.mark.parametrize("der", [np.array([-3.4, 6]), np.array([1.2, -22]),np.array([-1, 24.2]),np.array([0, 4.2])])
+def test_arccos_multivariate(val,der):
+    x = ad.Dual(val,der)
+    out = ad.arccos(x)
+    assert _equal(out,np.arccos(val),-der/(np.sqrt(1 - val**2)))
+
+@pytest.mark.parametrize("val",[1.0001,-1.0001,1.0001,-1.0001])
+@pytest.mark.parametrize("der", [1,0,np.array([-1, 24.2]),np.array([0, 4.2])])
+def test_arccos_undefined(val,der):
+    x = ad.Dual(val,der)
+    with pytest.raises(ValueError):
+        ad.arccos(x)
+
+@pytest.mark.parametrize("val", [0.7, 64, -0.3, -10, 11.4])
+def test_arctan_constant(val):
+    x = ad.Dual.constant(val)
+    out = ad.arctan(x)
+    assert _equal(out,np.arctan(val),0)
+
+
+@pytest.mark.parametrize("val", [0.7, 64, -0.3, -10, 11.4])
+@pytest.mark.parametrize("der", [2, 0, -1, 25.3, -19.1])
+def test_arctan_univariate(val,der):
+    x = ad.Dual(val,der)
+    out = ad.arctan(x)
+    assert _equal(out,np.arctan(val),der/(1+val**2))
+
+@pytest.mark.parametrize("val", [0.7, -0.3, -10, 11.4])
+@pytest.mark.parametrize("der", [np.array([-3.4, 6]), np.array([1.2, -22]),np.array([-1, 24.2]),np.array([0, 4.2])])
+def test_arctan_multivariate(val,der):
+    x = ad.Dual(val,der)
+    out = ad.arctan(x)
+    assert _equal(out,np.arctan(val),der/(1+val**2))
+
+
+@pytest.mark.parametrize("val", [0.7, 64, -0.5, 10, -10])
+def test_logistic_constant(val):
+    g = lambda z: 1 / (1 + np.exp(-z))
+    x = ad.Dual.constant(val)
+    out = ad.logistic(x)
+    assert _equal(out,g(val),0)
+
+
+@pytest.mark.parametrize("val", [0.7, 64, -0.3, -10, 11.4])
+@pytest.mark.parametrize("der", [2, 0, -1, 25.3, -19.1])
+def test_logistic_univariate(val,der):
+    g = lambda z: 1 / (1 + np.exp(-z))
+    x = ad.Dual(val,der)
+    out = ad.logistic(x)
+    assert _equal(out,g(val),der*g(val)*(1-g(val)))
+
+
+@pytest.mark.parametrize("val", [0.7, -0.3, -10, 11.4])
+@pytest.mark.parametrize("der", [np.array([-3.4, 6]), np.array([1.2, -22]),np.array([-1, 24.2]),np.array([0, 4.2])])
+def test_logistic_multivariate(val,der):
+    g = lambda z: 1 / (1 + np.exp(-z))
+    x = ad.Dual(val,der)
+    out = ad.logistic(x)
+    assert _equal(out,g(val),der*g(val)*(1-g(val)))
