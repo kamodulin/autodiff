@@ -1,4 +1,5 @@
 import numpy as np
+import warnings
 
 class Node:
     def __init__(self, val):
@@ -41,7 +42,7 @@ class Node:
                 arg.children = []
                 arg.der = None
             except AttributeError:
-                raise ValueError(f'Cannot set gradient to zero for type {self.__class__.__name__}')
+                raise AttributeError(f'Cannot set gradient to zero for type {arg.__class__.__name__}')
 
     @staticmethod
     def constant(val):
@@ -164,27 +165,57 @@ class Node:
 
     def __lt__(self, other):
         if other := self._isConstant(other):
-            return self.val < other.val
+            der_cp = None
+            if other.der is None or self.der is None:
+                warnings.warn('Attempting to compare two nodes with None derivatives',RuntimeWarning)
+            else:
+                der_cp = self.der < other.der
+            return self.val < other.val, der_cp
 
     def __gt__(self, other):
         if other := self._isConstant(other):
-            return self.val > other.val
+            der_cp = None
+            if other.der is None or self.der is None:
+                warnings.warn('Attempting to compare two nodes with None derivatives',RuntimeWarning)
+            else:
+                der_cp = self.der > other.der
+            return self.val > other.val, der_cp
 
     def __le__(self, other):
         if other := self._isConstant(other):
-            return self.val <= other.val
+            der_cp = None
+            if other.der is None or self.der is None:
+                warnings.warn('Attempting to compare two nodes with None derivatives',RuntimeWarning)
+            else:
+                der_cp = self.der <= other.der
+            return self.val <= other.val, der_cp
 
     def __ge__(self, other):
         if other := self._isConstant(other):
-            return self.val >= other.val
+            der_cp = None
+            if other.der is None or self.der is None:
+                warnings.warn('Attempting to compare two nodes with None derivatives',RuntimeWarning)
+            else:
+                der_cp = self.der >= other.der
+            return self.val >= other.val, der_cp
 
     def __eq__(self, other):
         if other := self._isConstant(other):
-            return self.val == other.val, self.der == other.der
+            der_cp = None
+            if other.der is None or self.der is None:
+                warnings.warn('Attempting to compare two nodes with None derivatives',RuntimeWarning)
+            else:
+                der_cp = self.der == other.der
+            return self.val == other.val, der_cp
 
     def __ne__(self, other):
         if other := self._isConstant(other):
-            return self.val != other.val, self.der != other.der
+            der_cp = None
+            if other.der is None or self.der is None:
+                warnings.warn('Attempting to compare two nodes with None derivatives',RuntimeWarning)
+            else:
+                der_cp = self.der != other.der
+            return self.val != other.val, der_cp
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.val})"

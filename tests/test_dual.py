@@ -226,14 +226,6 @@ def test_neg_univariate():
     der = False
     assert _compare((-x == y), val, der)
 
-
-def test_lt_multivariate():
-    x, y = ad.Dual.from_array([6, 4])
-    val = False
-    der = [True, True]
-    assert _compare((-x == y), val, der)
-
-
 def test_lt_constants():
     x = ad.Dual.constant(2)
     y = ad.Dual.constant(3)
@@ -251,9 +243,9 @@ def test_lt_univariate():
 
 def test_lt_multivariate():
     x, y = ad.Dual.from_array([6, -6])
-    val = True
-    der = [False, False]
-    assert _compare((-x == y), val, der)
+    val = False
+    der = [False, True]
+    assert _compare((x < y), val, der)
 
 
 def test_gt_constants():
