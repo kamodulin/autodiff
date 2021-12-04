@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class Node:
     def __init__(self, val):
         self.val = val
@@ -11,14 +10,14 @@ class Node:
         if self.children is not None and len(self.children) == 0:
             return 1.0
         if self.der is None:
-            self.der = sum(w * node.grad() for w, node in self.children)
+            self.der = sum(w*node.grad() for w, node in self.children)
         return self.der
 
-    # Experimental grad(): calls
-    # Params: variables with which to take the derivatives
+    # Experimental grad(): calls 
+    # Params: variables with which to take the derivatives 
     # Returns: list of derivatives
     # Sample use case: f.grad(x,y,z)
-
+    
     # def grad(self, *args):
     #     if len(args) == 0:
     #         return [1.0]
@@ -42,9 +41,7 @@ class Node:
                 arg.children = []
                 arg.der = None
             except AttributeError:
-                raise ValueError(
-                    f'Cannot set gradient to zero for type {self.__class__.__name__}'
-                )
+                raise ValueError(f'Cannot set gradient to zero for type {self.__class__.__name__}')
 
     @staticmethod
     def constant(val):
@@ -62,67 +59,66 @@ class Node:
 
         return iter(Node(x) for x in X)
 
-    def _is_constant(self, other):
+    def _isConstant(self, other, operand = None):
         if isinstance(other, (int, float)):
             return Node.constant(other)
         elif isinstance(other, Node):
             return other
-        raise TypeError(
-            f"unsupported operand type(s): '{type(self).__name__}' and '{type(other).__name__}'"
-        )
+        raise TypeError(f"unsupported operand type(s) for {operand}: '{type(self).__name__}' and '{type(other).__name__}'")
 
-    def _add_child(self, new_weight, new_child):
+
+    def _addChildren(self, new_weight, new_child):
         if self.children is not None:
             self.children.append((new_weight, new_child))
 
-    def __add__(self, other):
-        if other := self._is_constant(other):
+    def __add__(self,other):
+        if other := self._isConstant(other):
             child = Node(self.val + other.val)
-            self._add_child(1.0, child)
-            other._add_child(1.0, child)
+            self._addChildren(1.0,child)
+            other._addChildren(1.0,child)
             return child
 
-    def __radd__(self, other):
+    def __radd__(self,other):
         return self + other
 
-    def __mul__(self, other):
-        if other := self._is_constant(other):
-            child = Node(self.val * other.val)
-            self._add_child(other.val, child)
-            other._add_child(self.val, child)
+    def __mul__(self,other):
+        if other := self._isConstant(other):
+            child = Node(self.val*other.val)
+            self._addChildren(other.val, child)
+            other._addChildren(self.val, child)
             return child
 
-    def __rmul__(self, other):
+    def __rmul__(self,other):
         return self * other
 
-    def __sub__(self, other):
-        if other := self._is_constant(other):
+    def __sub__(self,other):
+        if other := self._isConstant(other):
             child = Node(self.val - other.val)
-            self._add_child(1.0, child)
-            other._add_child(-1.0, child)
+            self._addChildren(1.0,child)
+            other._addChildren(-1.0,child)
             return child
 
-    def __rsub__(self, other):
-        if other := self._is_constant(other):
+    def __rsub__(self,other):
+        if other := self._isConstant(other):
             child = Node(other.val - self.val)
-            self._add_child(-1.0, child)
-            other._add_child(1.0, child)
+            self._addChildren(-1.0,child)
+            other._addChildren(1.0,child)
             return child
 
     def __truediv__(self, other):
-        if other := self._is_constant(other):
-            child = Node(self.val / other.val)
-            self._add_child(1 / other.val, child)
-            other._add_child(-self.val / (other.val**2), child)
+        if other := self._isConstant(other):
+            child = Node(self.val/other.val)
+            self._addChildren(1/other.val,child)
+            other._addChildren(-self.val/(other.val**2),child)
             return child
 
     def __rtruediv__(self, other):
-        if other := self._is_constant(other):
-            child = Node(other.val / self.val)
-            self._add_child(-other.val / (self.val**2), child)
-            other._add_child(1 / self.val, child)
+        if other := self._isConstant(other):
+            child = Node(other.val/self.val)
+            self._addChildren(-other.val/(self.val**2),child)
+            other._addChildren(1/self.val,child)
             return child
-
+    
     def __pow__(self, other):
         if isinstance(other, (int, float)):
             if self.val < 0 and (other != int(other)):
@@ -140,12 +136,12 @@ class Node:
         try:
             val = self.val**other.val
             child = Node(val)
-            self._add_child(val * other.val / self.val, child)
-            other._add_child(val * np.log(self.val), child)
+            self._addChildren(val * other.val / self.val, child)
+            other._addChildren(val * np.log(self.val), child)
             return child
         except AttributeError:
             child = Node(self.val**other)
-            self._add_child(other * self.val**(other - 1), child)
+            self._addChildren(other*self.val**(other-1),child)
             return child
 
     def __rpow__(self, other):
@@ -155,8 +151,40 @@ class Node:
             )
         val = other**self.val
         child = Node(val)
-        self._add_child(val * np.log(other), child)
+        self._addChildren(val*np.log(other),child)
         return child
+
+    def __neg__(self):
+        if self.children == None:
+            child = Node.constant(-self.val)
+        else:
+            child = Node(-self.val)
+            self._addChildren(-1.0,child)
+        return child
+
+    def __lt__(self, other):
+        if other := self._isConstant(other):
+            return self.val < other.val
+
+    def __gt__(self, other):
+        if other := self._isConstant(other):
+            return self.val > other.val
+
+    def __le__(self, other):
+        if other := self._isConstant(other):
+            return self.val <= other.val
+
+    def __ge__(self, other):
+        if other := self._isConstant(other):
+            return self.val >= other.val
+
+    def __eq__(self, other):
+        if other := self._isConstant(other):
+            return self.val == other.val, self.der == other.der
+
+    def __ne__(self, other):
+        if other := self._isConstant(other):
+            return self.val != other.val, self.der != other.der
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.val})"
