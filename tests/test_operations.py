@@ -164,3 +164,28 @@ def test_sqrt_undefined(val):
     x = ad.Dual(val)
     with pytest.raises(ValueError):
         ad.sqrt(x)
+        
+@pytest.mark.parametrize("val", [0.7, -64])
+@pytest.mark.parametrize("der", [-2, 4.2])
+def test_logistic_univariate(val, der):
+    x = ad.Dual(val, der)
+    out = ad.logistic(x)
+    out_val = 1 / (1 + np.exp(-val))
+    out_der = der * out_val * (1 - out_val)
+    assert _equal(out, out_val, out_der)
+
+@pytest.mark.parametrize("val", [0.7, -64])
+@pytest.mark.parametrize("der", [np.array([-3.4, 6]), np.array([-1, 24.2])])
+def test_logistic_multivariate(val, der):
+    x = ad.Dual(val, der)
+    out = ad.logistic(x)
+    out_val = 1 / (1 + np.exp(-val))
+    out_der = der * out_val * (1 - out_val)
+    assert _equal(out, out_val, out_der)
+    
+@pytest.mark.parametrize("val", [1, 6.2])
+def test_logistic_constant(val):
+    x = ad.Dual.constant(val)
+    out = ad.logistic(x)
+    assert _equal(out, 1 / (1 + np.exp(-val)), 0)
+    
