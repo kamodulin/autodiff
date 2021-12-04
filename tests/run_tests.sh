@@ -3,6 +3,8 @@
 tests=(
     tests/test_dual.py
     tests/test_operations.py
+    tests/test_node.py
+    tests/test_reverse_operations.py
 )
 
 test='pytest'
