@@ -5,18 +5,23 @@ import autodiff.reverse as ad
 
 from utils import _equal
 
+
 @pytest.mark.parametrize("val", [1, -6.2])
 def test_sin_constant(val):
     x = ad.Node.constant(val)
     out = ad.sin(x)
-    assert _equal(out, np.sin(val), np.cos(val) * 0, np.array([x.grad()]))
+    der = np.cos(val) * 0
+    eval_der = np.array([x.grad()])
+    assert _equal(out, np.sin(val), der, eval_der)
 
 
-@pytest.mark.parametrize("val",[0.7,-64])
+@pytest.mark.parametrize("val", [0.7, -64])
 def test_sin_variable(val):
-	x = ad.Node(val)
-	out = ad.sin(x)
-	assert _equal(out, np.sin(val), np.cos(val), np.array([x.grad()]))
+    x = ad.Node(val)
+    out = ad.sin(x)
+    der = np.cos(val)
+    eval_der = np.array([x.grad()])
+    assert _equal(out, np.sin(val), der, eval_der)
 
 
 @pytest.mark.parametrize("val", [0.7, -64])
@@ -25,9 +30,11 @@ def test_sin_variable(val):
 def test_sin_multichildren(val, der, child_val):
     x = ad.Node(val)
     child = ad.Node(child_val)
-    x._addChildren(der,child)
+    x._addChildren(der, child)
     out = ad.sin(x)
-    assert _equal(out, np.sin(val), np.cos(val) + der, np.array([x.grad()]))
+    der = np.cos(val) + der
+    eval_der = np.array([x.grad()])
+    assert _equal(out, np.sin(val), der, eval_der)
 
 
 @pytest.mark.parametrize("val", [1, -6.2])
@@ -70,7 +77,6 @@ def test_cosh_variable(val):
     x = ad.Node(val)
     out = ad.tanh(x)
     assert _equal(out, np.tanh(val), 1-(np.tanh(val))**2, np.array([x.grad()]))
-
 
 # Test for Inverse trig function
 

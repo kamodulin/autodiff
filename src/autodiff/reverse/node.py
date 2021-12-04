@@ -118,6 +118,41 @@ class Node:
             self._addChildren(-other.val/(self.val**2),child)
             other._addChildren(1/self.val,child)
             return child
+    
+    def __pow__(self, other):
+        if isinstance(other, (int, float)):
+            if self.val < 0 and (other != int(other)):
+                raise ValueError(
+                    f"{self.val} cannot be raised to the power of {other}; only integer powers are allowed if base is negative"
+                )
+            elif self.val == 0 and other < 1:
+                raise ZeroDivisionError(
+                    f"0.0 cannot be raised to a negative power")
+        elif isinstance(other, Node):
+            if self.val <= 0:
+                raise ValueError(
+                    f"{self.val} cannot be raised to the power of {other.val}; log is undefined for x = {self.val}"
+                )
+        try:
+            val = self.val**other.val
+            child = Node(val)
+            self._addChildren(val * other.val / self.val, child)
+            other._addChildren(val * np.log(self.val), child)
+            return child
+        except AttributeError:
+            child = Node(self.val**other)
+            self._addChildren(other*self.val**(other-1),child)
+            return child
+
+    def __rpow__(self, other):
+        if other <= 0:
+            raise ValueError(
+                f"{other} cannot be raised to the power of {self.val}; log is undefined for x = {other}"
+            )
+        val = other**self.val
+        child = Node(val)
+        self._addChildren(val*np.log(other),child)
+        return child
 
     def __neg__(self):
         if self.children == None:
