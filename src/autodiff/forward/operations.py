@@ -342,7 +342,7 @@ def log(x):
         return Dual(val, der)
     except AttributeError:
         if x <= 0:
-            raise ValueError(f"Log of x is undefined for x = {x.val}")
+            raise ValueError(f"Log of x is undefined for x = {x}")
         return np.log(x)
 
 
