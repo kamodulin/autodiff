@@ -1,9 +1,8 @@
-{% extends "!autosummary/class.rst" %}
+{{ fullname | escape | underline}}
 
-{% block methods %} {% if methods %}
+.. currentmodule:: {{ module }}
 
-{% endif %} {% endblock %}
+.. autoclass:: {{ objname }}
+   :members:
 
-{% block attributes %} {% if attributes %}
-
-{% endif %} {% endblock %}
+   .. autoclasstoc::

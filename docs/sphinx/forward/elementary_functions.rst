@@ -3,8 +3,6 @@ Elementary operations
 =========
 .. currentmodule:: autodiff
 
-Elementary functions
-~~~~~~~~~~~
 .. autosummary::
    :toctree: api/
    
