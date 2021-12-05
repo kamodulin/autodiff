@@ -18,13 +18,15 @@ def sin(x):
 
     Returns
     -------
-    out : float or Node
+    y : float or Node
 
     Examples
     --------
     >>> sin(np.pi / 2)
     1.0
-    >>> sin(Node(np.pi / 2))
+
+    >>> x = ad.Node(np.pi / 2)
+    >>> ad.sin(x)
     Node(1.0)
     """
     try:
@@ -45,14 +47,16 @@ def cos(x):
 
     Returns
     -------
-    out : float or Node
+    y : float or Node
 
     Examples
     --------
-    >>> cos(np.pi / 2)
-    6.123233995736766e-17
-    >>> cos(Node(np.pi / 2))
-    Node(6.123233995736766e-17)
+    >>> ad.cos(np.pi / 2)
+    0.0
+
+    >>> x = ad.Node(np.pi / 2)
+    >>> ad.cos(x)
+    Node(0)
     """
     try:
         child = Node(np.cos(x.val))
@@ -72,7 +76,7 @@ def tan(x):
 
     Returns
     -------
-    out : float or Node
+    y : float or Node
 
     Notes
     -----
@@ -80,10 +84,20 @@ def tan(x):
 
     Examples
     --------
-    >>> tan(np.pi / 4)
-    0.9999999999999999
-    >>> tan(Node(np.pi / 4))
-    Node(0.9999999999999999)
+    >>> ad.tan(np.pi / 4)
+    1.0
+
+    >>> x = ad.Node(np.pi / 4)
+    >>> ad.tan(x)
+    Node(1.0)
+
+    Derivative undefined:
+    
+    >>> x = ad.Node(np.pi / 2)
+    >>> ad.tan(x)
+    Traceback (most recent call last):
+    ...
+    ValueError: Derivative of tan(x) is undefined for x = 1.5707963267948966
     """
     try:
         if np.isclose(np.cos(x.val), 0):
@@ -106,13 +120,15 @@ def sinh(x):
 
     Returns
     -------
-    out : float or Node
+    y : float or Node
 
     Examples
     --------
-    >>> sinh(1)
+    >>> ad.sinh(1)
     1.1752011936438014
-    >>> sinh(Node(2))
+
+    >>> x = ad.Node(2)
+    >>> ad.sinh(x)
     Node(3.626860407847019)
     """
     try:
@@ -133,13 +149,15 @@ def cosh(x):
 
     Returns
     -------
-    out : float or Node
+    y : float or Node
 
     Examples
     --------
-    >>> cosh(1)
+    >>> ad.cosh(1)
     1.5430806348152437
-    >>> cosh(Node(2))
+
+    >>> x = ad.Node(2)
+    >>> ad.cosh(x)
     Node(3.7621956910836314)
     """
     try:
@@ -160,13 +178,15 @@ def tanh(x):
 
     Returns
     -------
-    out : float or Node
+    y : float or Node
 
     Examples
     --------
-    >>> tanh(1)
+    >>> ad.tanh(1)
     0.7615941559557649
-    >>> tanh(Node(1))
+
+    >>> x = ad.Node(1)
+    >>> ad.tanh(x)
     Node(0.7615941559557649)
     """
     try:
@@ -187,7 +207,7 @@ def arcsin(x):
 
     Returns
     -------
-    out : float or Node
+    y : float or Node
 
     Notes
     -----
@@ -195,11 +215,17 @@ def arcsin(x):
 
     Examples
     --------
-    >>> arcsin(1)
+    >>> ad.arcsin(1)
     1.5707963267948966
-    >>> arcsin(Node(0.50))
+
+    >>> x = ad.Node(0.5)
+    >>> ad.arcsin(x)
     Node(0.5235987755982989)
-    >>> arcsin(Node(1))
+
+    Derivative undefined:
+
+    >>> x = ad.Node(1)
+    >>> ad.arcsin(x)
     Traceback (most recent call last):
     ...
     ValueError: Derivative of arcsin(x) is undefined for x = 1
@@ -225,7 +251,7 @@ def arccos(x):
 
     Returns
     -------
-    out : float or Node
+    y : float or Node
 
     Notes
     -----
@@ -233,11 +259,17 @@ def arccos(x):
 
     Examples
     --------
-    >>> arccos(1)
+    >>> ad.arccos(1)
     0.0
-    >>> arccos(Node(0.5))
+    
+    >>> x = ad.Node(0.5)
+    >>> ad.arccos(x)
     Node(1.0471975511965979)
-    >>> arccos(Node(1))
+
+    Derivative undefined:
+
+    >>> x = ad.Node(1)
+    >>> ad.arccos(x)
     Traceback (most recent call last):
     ...
     ValueError: Derivative of arcsin(x) is undefined for x = 1
@@ -263,13 +295,15 @@ def arctan(x):
 
     Returns
     -------
-    out : float or Node
+    y : float or Node
 
     Examples
     --------
-    >>> arctan(1)
+    >>> ad.arctan(1)
     0.7853981633974483
-    >>> arctan(Node(1))
+
+    >>> x = ad.Node(1)
+    >>> ad.arctan(x)
     Node(0.7853981633974483)
     """
     try:
@@ -290,13 +324,15 @@ def exp(x):
 
     Returns
     -------
-    out : float or Node
+    y : float or Node
 
     Examples
     --------
-    >>> exp(1)
+    >>> ad.exp(1)
     2.718281828459045
-    >>> exp(Node(1))
+
+    >>> x = ad.Node(1)
+    >>> ad.exp(x)
     Node(2.718281828459045)
     """
     try:
@@ -317,7 +353,7 @@ def log(x):
 
     Returns
     -------
-    out : float or Node
+    y : float or Node
 
     Notes
     -----
@@ -325,11 +361,17 @@ def log(x):
 
     Examples
     --------
-    >>> log(2)
+    >>> ad.log(2)
     0.6931471805599453
-    >>> log(Node(2))
+
+    >>> x = ad.Node(2)
+    >>> ad.log(x)
     Node(0.6931471805599453)
-    >>> log(Node(0))
+
+    Derivative undefined:
+
+    >>> x = ad.Node(0)
+    >>> ad.log(x)
     Traceback (most recent call last):
     ...
     ValueError: Log of x is undefined for x = 0
@@ -356,7 +398,7 @@ def sqrt(x):
 
     Returns
     -------
-    out : float or Node
+    y : float or Node
 
     Notes
     -----
@@ -364,11 +406,17 @@ def sqrt(x):
 
     Examples
     --------
-    >>> sqrt(4)
+    >>> ad.sqrt(4)
     2.0
-    >>> sqrt(Node(4))
+
+    >>> x = ad.Node(4)
+    >>> ad.sqrt(x)
     Node(2.0)
-    >>> sqrt(Node(-1))
+
+    Derivative undefined:
+
+    >>> x = ad.Node(-1)
+    >>> ad.sqrt(x)
     Traceback (most recent call last):
     ...
     ValueError: Derivative of sqrt(x) is undefined for x < 0
@@ -395,13 +443,15 @@ def logistic(x):
 
     Returns
     -------
-    out : float or Node
+    y : float or Node
 
     Examples
     --------
-    >>> logistic(1)
+    >>> ad.logistic(1)
     0.7310585786300049
-    >>> logistic(Node(3))
+
+    >>> x = ad.Node(3)
+    >>> ad.logistic(x)
     Node(0.9525741268224334)
     """
     g = lambda z: 1 / (1 + np.exp(-z))

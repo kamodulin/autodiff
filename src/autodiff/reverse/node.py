@@ -1,7 +1,67 @@
 import numpy as np
 import warnings
 
+
 class Node:
+    """
+    Primary data structure for reverse mode automatic differentiation.
+
+    The process of evaluating derivatives in reverse mode consists of
+    two passes, forward pass and reverse pass. During the forward pass,
+    we calculate the primal values and the local gradient of child nodes
+    with respect of each parent node in the computational graph. 
+    In the reverse pass, we recursively calculate the gradients.
+
+    Parameters
+    ----------
+    val : float
+        The value of the Node.
+    children : list
+        List of tuples of (weight, child) where weight is the weight of the
+        sensitivity of the child node with respect to the parent node and child
+        is the child node.
+    der : float
+        Initialiazed to None, represents the derivative of the last descendent
+        with respect to self.
+
+    Examples
+    --------
+    Construct a Node for a univariate function:
+
+    >>> x = ad.Node(42)
+    >>> x
+    Node(42)
+
+
+    Construct multiple Nodes from array of scalars:
+
+    >>> x, y, z = ad.Node.from_array([1, 2, 4])
+    >>> x
+    Node(1)
+    >>> y
+    Node(2)
+
+    Create a function from multiple Nodes:
+
+    >>> x, y, z = ad.Node.from_array([1, 2, 4])
+    >>> f = (x * y)/z
+    >>> f.val
+    0.5
+    >>> x.grad()
+    0.5
+    >>> y.grad()
+    0.25
+    >>> z.grad()
+    -0.125
+
+    See Also
+    --------
+    Node.grad
+    Node.zero_grad
+    Node.constant
+    Node.from_array
+
+    """
     def __init__(self, val):
         self.val = val
         self.children = []
@@ -9,7 +69,7 @@ class Node:
 
     def grad(self):
         """
-        Return the gradient of the last descendent with respect to self 
+        Return the gradient of the last descendent with respect to self.
 
         Parameters
         ----------
@@ -21,13 +81,18 @@ class Node:
 
         Examples
         --------
-        >>> x, y = Node(1),Node(1)
-        >>> x + 3*y
+        >>> x, y = ad.Node(1), ad.Node(1)
+        >>> x + 3 * y
         Node(4)
         >>> x.grad()
         1.0
         >>> y.grad()
         3.0
+
+        See Also
+        --------
+        Node.zero_grad
+
         """
         if self.children is not None and len(self.children) == 0:
             return 1.0
@@ -38,7 +103,7 @@ class Node:
     @staticmethod
     def zero_grad(*args):
         """
-        Reset Nodes to their default attributes
+        Reset Nodes to their default attributes.
 
         Parameters
         ----------
@@ -50,13 +115,17 @@ class Node:
         
         Examples
         --------
-        >>> x = Node(3)
+        >>> x = ad.Node(3)
         >>> f = ad.sin(x)
         >>> x.grad()
         -0.9899924966004454
-        >>> Node.zero_grad(x)
+        >>> ad.Node.zero_grad(x)
         >>> x.grad()
         1.0
+
+        See Also
+        --------
+        Node.grad
         """
         for arg in args:
             try:
@@ -82,9 +151,9 @@ class Node:
 
         Examples
         --------
-        >>> Node.constant(42)
+        >>> ad.Node.constant(42)
         Node(42)
-        >>> Node.constant(1)
+        >>> ad.Node.constant(1)
         Node(1)
         """
         node = Node(val)
@@ -104,13 +173,13 @@ class Node:
 
         Returns
         -------
-        out : Nodes generator
+        out : Node generator
             Nodes of value `X[i]` with der set to None
             and an empty list of children.
         
         Examples
         --------
-        >>> x, y, z = Node.from_array([1,2,3])
+        >>> x, y, z = ad.Node.from_array([1,2,3])
         >>> x
         Node(1)
         >>> y
@@ -125,10 +194,10 @@ class Node:
 
         return iter(Node(x) for x in X)
 
-    def _isConstant(self, other, operand = None):
+    def _isConstant(self, other, operand=None):
         """
         Return other element as a constant Node if other is a number and raises
-        an type error if other is neither a number nor a Node
+        an type error if other is neither a number nor a Node.
 
         Parameters
         ----------
@@ -140,15 +209,21 @@ class Node:
         -------
         out : Node or TypeError
             Node if `other` is a float, int or Node. Raise error if other is neither
-            Node nor a number
+            Node nor a number.
 
         Examples
         --------
-        >>> x = Node(42)
-        >>> x._isConstant(Node(1))
+        >>> x = ad.Node(42)
+
+        Valid inputs:
+
+        >>> x._isConstant(ad.Node(1))
         Node(1)
         >>> x._isConstant(1)
         Node(1)
+
+        Invalid string input:
+
         >>> x._isConstant("autodiff")
         Traceback (most recent call last):
         ...
@@ -164,7 +239,7 @@ class Node:
     def _addChildren(self, new_weight, new_child):
         """
         Add a tuple of (new_weight, new _child) to self's children list if children
-        list is not None
+        list is not None.
 
         Parameters
         ----------
@@ -178,13 +253,30 @@ class Node:
 
         Examples
         --------
-        >>> x = Node(42)
-        >>> x._addChildren(4.2,Node(1))
+        >>> x = ad.Node(42)
+        >>> y = ad.Node(1)
+        >>> x._addChildren(4.2, y)
         >>> x.children
         [(4.2, Node(1))]
         """
         if self.children is not None:
             self.children.append((new_weight, new_child))
+
+
+    def __repr__(self):
+        """
+        Return a string representation of the Node.
+
+        Parameters
+        ----------
+        self : Node
+
+        Returns
+        -------
+        out : str
+        """
+        return f"{self.__class__.__name__}({self.val})"
+
 
     def __add__(self,other):
         """
@@ -201,11 +293,16 @@ class Node:
         
         Examples
         --------
-        >>> Node(42) + 5
+        Node and scalar:
+
+        >>> ad.Node(42) + 5
         Node(47)
-        >>> Node(42) + Node(1)
+
+        Two nodes:
+
+        >>> ad.Node(42) + ad.Node(1)
         Node(43)
-        >>> Node(42) + Node.constant(1)
+        >>> ad.Node(42) + ad.Node.constant(1)
         Node(43)
         """
         if other := self._isConstant(other):
@@ -229,9 +326,11 @@ class Node:
         
         Examples
         --------
-        >>> 1.2 + Node(42)
+        Scalar and Node:
+
+        >>> 1.2 + ad.Node(42)
         Node(43.2)
-        >>> -3.6 + Node.constant(42)
+        >>> -3.6 + ad.Node.constant(42)
         Node(38.4)
         """
         return self + other
@@ -251,11 +350,15 @@ class Node:
 
         Examples
         --------
-        >>> Node(42) * 5
+        Node and scalar:
+
+        >>> ad.Node(42) * 5
         Node(210)
-        >>> Node(5.6) * Node(1)
+
+        Two nodes:
+        >>> ad.Node(5.6) * ad.Node(1)
         Node(5.6)
-        >>> Node.constant(-9) * Node(4)
+        >>> ad.Node.constant(-9) * ad.Node(4)
         Node(-36)
         """
         if other := self._isConstant(other):
@@ -279,9 +382,11 @@ class Node:
 
         Examples
         --------
-        >>> 1.2 * Node(42)
+        Scalar and Node:
+
+        >>> 1.2 * ad.Node(42)
         Node(50.4)
-        >>> -3 * Node.constant(42)
+        >>> -3 * ad.Node.constant(42)
         Node(-126)
         """
         return self * other
@@ -301,11 +406,16 @@ class Node:
 
         Examples
         --------
-        >>> Node(42) - 5
+        Node and scalar:
+
+        >>> ad.Node(42) - 5
         Node(37)
-        >>> Node(42) - Node(1)
+
+        Two nodes:
+
+        >>> ad.Node(42) - ad.Node(1)
         Node(41)
-        >>> Node(42) - Node.constant(2)
+        >>> ad.Node(42) - ad.Node.constant(2)
         Node(40)
         """
         if other := self._isConstant(other):
@@ -330,9 +440,11 @@ class Node:
 
         Examples
         --------
-        >>> 1.2 - Node(42)
+        Scalar and Node:
+
+        >>> 1.2 - ad.Node(42)
         Node(-40.8)
-        >>> -3.6 - Node.constant(42)
+        >>> -3.6 - ad.Node.constant(42)
         Node(-45.6)
         """
         if other := self._isConstant(other):
@@ -356,11 +468,16 @@ class Node:
 
         Examples
         --------
-        >>> Node(42) / 5
+        Node and scalar:
+
+        >>> ad.Node(42) / 5
         Node(8.4)
-        >>> Node(4) / Node(5)
+
+        Two nodes:
+
+        >>> ad.Node(4) / ad.Node(5)
         Node(0.8)
-        >>> Node.constant(42) / Node(1)
+        >>> ad.Node.constant(42) /ad.Node(1)
         Node(42.0)
         """
         if other := self._isConstant(other):
@@ -371,7 +488,7 @@ class Node:
 
     def __rtruediv__(self, other):
         """
-        Return the quotient of two numbers, when the left operand is not a Node
+        Return the quotient of two numbers, when the left operand is not a Node.
 
         Parameters
         ----------
@@ -383,10 +500,12 @@ class Node:
         out : Node
 
         Examples
-        --------        
-        >>> 2 / Node(4)
+        --------    
+        Scalar and Node:
+
+        >>> 2 / ad.Node(4)
         Node(0.5)
-        >>> 2 / Node.constant(4)
+        >>> 2 / ad.Node.constant(4)
         Node(0.5)
         """
         if other := self._isConstant(other):
@@ -423,15 +542,20 @@ class Node:
 
         Examples
         --------
-        >>> Node(2) ** 5
+        Node and scalar:
+
+        >>> ad.Node(2) ** 5
         Node(32)
-        >>> Node(2) ** Node(3)
+
+        Two nodes:
+
+        >>> ad.Node(2) ** ad.Node(3)
         Node(8)
-        >>> Node(2) ** Node.constant(3)
+        >>> ad.Node(2) ** ad.Node.constant(3)
         Node(8)
 
-        Errors
-        ------
+        Example of errors raised (see notes above):
+
         >>> Node(-1) ** 1.2
         Traceback (most recent call last):
         ...
@@ -484,11 +608,11 @@ class Node:
 
         Examples
         --------
-        >>> 5 ** Node(2)
+        >>> 5 ** ad.Node(2)
         Node(25)
-        >>> Node(2) ** 3
+        >>> ad.Node(2) ** 3
         Node(8)
-        >>> Node(2) ** Node.constant(3)
+        >>> ad.Node(2) ** ad.Node.constant(3)
         Node(8)
         """
         if other <= 0:
@@ -514,9 +638,9 @@ class Node:
 
         Examples
         --------
-        >>> -Node(42)
+        >>> -ad.Node(42)
         Node(-42)
-        >>> -Node.constant(42)
+        >>> -ad.Node.constant(42)
         Node(-42)
         """
         if self.children == None:
@@ -544,18 +668,20 @@ class Node:
         -----
         If either `other` or self has None der. We return None for the derivative comparison and 
         give user a warning indicating that they are attempting to compare two Nodes before their
-        derivatives are computed
+        derivatives are computed.
 
         Examples
         --------
-        >>> Node(42) < 5
-        RuntimeWarning: Attempting to compare two nodes with None derivatives
-        warnings.warn('Attempting to compare two nodes with None derivatives',RuntimeWarning)
-        (False, None)
-        >>> Node.constant(42) < Node.constant(5)
+        >>> ad.Node.constant(42) < ad.Node.constant(5)
         (False, False)
-        >>> Node.constant(42) < Node.constant(50)
+        >>> ad.Node.constant(42) < ad.Node.constant(50)
         (True, False)
+
+        Warning before derivatives are computed:
+
+        >>> ad.Node(42) < 5
+        RuntimeWarning: Attempting to compare two nodes with None derivatives
+        (False, None)
         """
         if other := self._isConstant(other):
             der_cp = None
@@ -583,18 +709,20 @@ class Node:
         -----
         If either `other` or self has None der. We return None for the derivative comparison and 
         give user a warning indicating that they are attempting to compare two Nodes before their
-        derivatives are computed
+        derivatives are computed.
 
         Examples
         --------
-        >>> Node(42) > 5
-        RuntimeWarning: Attempting to compare two nodes with None derivatives
-        warnings.warn('Attempting to compare two nodes with None derivatives',RuntimeWarning)
-        (True, None)
-        >>> Node.constant(42) > Node.constant(5)
+        >>> ad.Node.constant(42) > ad.Node.constant(5)
         (True, False)
-        >>> Node.constant(42) > Node.constant(50)
+        >>> ad.Node.constant(42) > ad.Node.constant(50)
         (False, False)
+
+        Warning before derivatives are computed:
+
+        >>> ad.Node(42) > 5
+        RuntimeWarning: Attempting to compare two nodes with None derivatives
+        (True, None)
         """
         if other := self._isConstant(other):
             der_cp = None
@@ -626,14 +754,16 @@ class Node:
 
         Examples
         --------
-        >>> Node(42) <= 5
-        RuntimeWarning: Attempting to compare two nodes with None derivatives
-        warnings.warn('Attempting to compare two nodes with None derivatives',RuntimeWarning)
-        (False, None)
-        >>> Node.constant(42) <= Node.constant(5)
+        >>> ad.Node.constant(42) <= ad.Node.constant(5)
         (False, True)
-        >>> Node.constant(42) <= Node.constant(50)
+        >>> ad.Node.constant(42) <= ad.Node.constant(50)
         (True, True)
+
+        Warning before derivatives are computed:
+
+        >>> ad.Node(42) <= 5
+        RuntimeWarning: Attempting to compare two nodes with None derivatives
+        (False, None)
         """
         if other := self._isConstant(other):
             der_cp = None
@@ -661,18 +791,20 @@ class Node:
         -----
         If either `other` or self has None der. We return None for the derivative comparison and 
         give user a warning indicating that they are attempting to compare two Nodes before their
-        derivatives are computed
+        derivatives are computed.
 
         Examples
         --------
-        >>> Node(42) >= 5
-        RuntimeWarning: Attempting to compare two nodes with None derivatives
-        warnings.warn('Attempting to compare two nodes with None derivatives',RuntimeWarning)
-        (True, None)
-        >>> Node.constant(42) >= Node.constant(5)
+        >>> ad.Node.constant(42) >= ad.Node.constant(5)
         (True, True)
-        >>> Node.constant(42) >= Node.constant(50)
+        >>> ad.Node.constant(42) >= ad.Node.constant(50)
         (False, True)
+
+        Warning before derivatives are computed:
+
+        >>> ad.Node(42) >= 5
+        RuntimeWarning: Attempting to compare two nodes with None derivatives
+        (True, None)
         """
         if other := self._isConstant(other):
             der_cp = None
@@ -700,18 +832,20 @@ class Node:
         -----
         If either `other` or self has None der. We return None for the derivative comparison and 
         give user a warning indicating that they are attempting to compare two Nodes before their
-        derivatives are computed
+        derivatives are computed.
 
         Examples
         --------
-        >>> Node(42) == 5
-        RuntimeWarning: Attempting to compare two nodes with None derivatives
-        warnings.warn('Attempting to compare two nodes with None derivatives',RuntimeWarning)
-        (False, None)
-        >>> Node.constant(42) == Node.constant(5)
+        >>> ad.Node.constant(42) == ad.Node.constant(5)
         (False, True)
-        >>> Node.constant(42) == Node.constant(42)
+        >>> ad.Node.constant(42) == ad.Node.constant(42)
         (True, True)
+
+        Warning before derivatives are computed:
+
+        >>> ad.Node(42) == 5
+        RuntimeWarning: Attempting to compare two nodes with None derivatives
+        (False, None)
         """
         if other := self._isConstant(other):
             der_cp = None
@@ -743,14 +877,16 @@ class Node:
 
         Examples
         --------
-        >>> Node(42) != 5
+        >>> ad.Node.constant(42) != ad.Node.constant(5)
+        (True, False)
+        >>> ad.Node.constant(42) != ad.Node.constant(42)
+        (False, False)
+
+        Warning before derivatives are computed:
+
+        >>> ad.Node(42) != 5
         RuntimeWarning: Attempting to compare two nodes with None derivatives
-        warnings.warn('Attempting to compare two nodes with None derivatives',RuntimeWarning)
         (True, None)
-        >>> Node.constant(42) != Node.constant(5)
-        (True, True)
-        >>> Node.constant(42) != Node.constant(42)
-        (False, True)
         """
         if other := self._isConstant(other):
             der_cp = None
@@ -759,17 +895,3 @@ class Node:
             else:
                 der_cp = self.der != other.der
             return self.val != other.val, der_cp
-
-    def __repr__(self):
-        """
-        Return a string representation of the Node.
-
-        Parameters
-        ----------
-        self : Node
-
-        Returns
-        -------
-        out : str
-        """
-        return f"{self.__class__.__name__}({self.val})"
