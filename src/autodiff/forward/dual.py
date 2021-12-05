@@ -2,6 +2,59 @@ import numpy as np
 
 
 class Dual:
+    """
+    Primary data structure for forward mode automatic differentiation.
+
+    Dual numbers can be used as a data structure to store the value and
+    derivative of a function. The value and derivative can be stored as
+    the real and "dual" part of a dual number, respectively. The properties
+    of a dual number lend itself nicely to a straightforward implementation of
+    forward mode automatic differentiation.
+
+    Parameters
+    ----------
+    val : float
+        The value of the Dual number.
+    der : ndarray
+        The derivative of the Dual number.
+
+    Examples
+    --------
+    Construct a Dual number for a univariate function:
+
+    >>> x = ad.Dual(42)
+    >>> x
+    Dual(42, array([1]))
+
+    Construct a Dual number for a multivariate function with user-defined seed vector:
+
+    >>> x = ad.Dual(42, [1, 2])
+    >>> x
+    Dual(42, array([1, 2]))
+
+    Construct multiple Dual numbers from array of scalars:
+
+    >>> x, y, z = ad.Dual.from_array([1, 2, 4])
+    >>> x
+    Dual(1, array([1, 0, 0]))
+    >>> y
+    Dual(2, array([0, 1, 0]))
+
+    Create a function from multiple Dual numbers:
+
+    >>> x, y, z = ad.Dual.from_array([1, 2, 4])
+    >>> f = (x * y)/z
+    >>> f.val
+    0.5
+    >>> f.der
+    array([0.5, 0.25, -0.125])
+
+    See Also
+    --------
+    Dual.constant
+    Dual.from_array
+
+    """
     def __init__(self, val, der=1):
         self.val = val
         self.der = np.array(der, ndmin=1)
@@ -22,10 +75,13 @@ class Dual:
         
         Examples
         --------
-        >>> Dual(42, [1, 2]).ndim
-        2
-        >>> Dual(-5, [6.2]).ndim
+        >>> ad.Dual(-5, [6.2]).ndim
         1
+        
+        More than one dimension:
+        
+        >>> ad.Dual(42, [1, 2]).ndim
+        2
         """
         return len(self.der)
 
@@ -40,22 +96,25 @@ class Dual:
             Value of dual number.
 
         ndim : int, optional
-            `ndim` is the number of dimensions of the zero derivative vector.
+            ``ndim`` is the number of dimensions of the zero derivative vector.
 
         Returns
         -------
         out : Dual
-            Dual number of value `val` with zero derivative vector.
+            Dual number of value ``val`` with zero derivative vector.
 
         Notes
         -----
-        Derivative vector of length `ndim` will be filled with zeros.
+        Derivative vector of length ``ndim`` will be filled with zeros.
 
         Examples
         --------
-        >>> Dual.constant(42)
+        >>> ad.Dual.constant(42)
         Dual(42, array([0.]))
-        >>> Dual.constant(7, 2)
+
+        Constant with more than one dimension:
+
+        >>> ad.Dual.constant(7, 2)
         Dual(7, array([0., 0.]))
         """
         zeros = np.zeros(ndim)
@@ -74,12 +133,12 @@ class Dual:
         Returns
         -------
         out : Dual number generator
-            Dual numbers of value `X[i]` with zero derivative vector
+            Dual numbers of value ``X[i]`` with zero derivative vector
             where the i-th element has a value of 1.
 
         Examples
         --------
-        >>> x, y = Dual.from_array([1, 42])
+        >>> x, y = ad.Dual.from_array([1, 42])
         >>> x
         Dual(1, array([1., 0.]))
         >>> y
@@ -95,7 +154,7 @@ class Dual:
 
     def _compatible(self, other, operand=None):
         """
-        Return other element if compatible with type `Dual` and ensure that the
+        Return other element if compatible with type ``Dual`` and ensure that the
         number of dimensions match between the two Duals.
 
         Parameters
@@ -107,18 +166,26 @@ class Dual:
         Returns
         -------
         out : Dual, ArithmeticError, or TypeError
-            Dual if `other` is compatible. Raise error if other does not have
+            Dual if ``other`` is compatible. Raise error if other does not have
             matching dimensions or not of correct type.
 
         Examples
         --------
-        >>> d0 = Dual(42)
-        >>> d0._compatible(Dual(1))
+        >>> d0 = ad.Dual(42)
+        >>> d1 = ad.Dual(1)
+        >>> d0._compatible(d1)
         Dual(1, array([1]))
-        >>> d0._compatible(Dual(10, [0, 1]))
+
+        Dimension mismatch:
+
+        >>> d2 = ad.Dual(10, [0, 1])
+        >>> d0._compatible(d2)
         Traceback (most recent call last):
         ...
         ArithmeticError: Dimensionality mismatch between Dual(42, array([1])) and Dual(10, array([0, 1]))
+
+        Incorrect type:
+
         >>> d0._compatible("autodiff")
         Traceback (most recent call last):
         ...
@@ -151,7 +218,7 @@ class Dual:
 
     def __add__(self, other):
         """
-        Return the sum of `self` and `other`.
+        Return the sum of ``self`` and ``other``.
 
         Parameters
         ----------
@@ -164,11 +231,19 @@ class Dual:
         
         Examples
         --------
-        >>> Dual(42) + 5
+        Dual number and scalar:
+
+        >>> ad.Dual(42) + 5
         Dual(47, array([1]))
-        >>> Dual(42) + Dual(1)
+
+        Two dual numbers (univariate):
+
+        >>> ad.Dual(42) + ad.Dual(1)
         Dual(43, array([2]))
-        >>> Dual(42, [1, 2]) + Dual(1, [3, 4])
+
+        Two dual numbers (multivariate):
+
+        >>> ad.Dual(42, [1, 2]) + ad.Dual(1, [3, 4])
         Dual(43, array([4, 6]))
         """
         if other := self._compatible(other, "+"):
@@ -190,16 +265,21 @@ class Dual:
         
         Examples
         --------
-        >>> 1.2 + Dual(42)
+        Scalar and dual number (univariate):
+
+        >>> 1.2 + ad.Dual(42)
         Dual(43.2, array([1]))
-        >>> -3.6 + Dual(42, [1, 2])
+
+        Scalar and dual number (multivariate):
+
+        >>> -3.6 + ad.Dual(42, [1, 2])
         Dual(38.4, array([1, 2]))
         """
         return self + other
 
     def __sub__(self, other):
         """
-        Returns the difference between `self` and `other`.
+        Returns the difference between ``self`` and ``other``.
 
         Parameters
         ----------
@@ -212,11 +292,19 @@ class Dual:
 
         Examples
         --------
-        >>> Dual(42) - 5
+        Dual number and scalar:
+
+        >>> ad.Dual(42) - 5
         Dual(37, array([1]))
-        >>> Dual(42) - Dual(1)
+
+        Two dual numbers (univariate):
+
+        >>> ad.Dual(42) - ad.Dual(1)
         Dual(41, array([0]))
-        >>> Dual(42, [1, 2]) - Dual(1, [3, 4])
+
+        Two dual numbers (multivariate):
+
+        >>> ad.Dual(42, [1, 2]) - ad.Dual(1, [3, 4])
         Dual(41, array([-2, -2]))
         """
         if other := self._compatible(other, "-"):
@@ -238,9 +326,14 @@ class Dual:
 
         Examples
         --------
-        >>> 1.2 - Dual(42)
+        Scalar and dual number (univariate):
+
+        >>> 1.2 - ad.Dual(42)
         Dual(-40.8, array([-1.]))
-        >>> -3.6 - Dual(42, [1, 2])
+
+        Scalar and dual number (multivariate):
+
+        >>> -3.6 - ad.Dual(42, [1, 2])
         Dual(-45.6, array([-1., -2.]))
         """
         if other := self._compatible(other, "-"):
@@ -248,7 +341,7 @@ class Dual:
 
     def __mul__(self, other):
         """
-        Return the product of `self` and `other`.
+        Return the product of ``self`` and ``other``.
 
         Parameters
         ----------
@@ -261,11 +354,19 @@ class Dual:
 
         Examples
         --------
-        >>> Dual(42) * 5
+        Dual number and scalar:
+
+        >>> ad.Dual(42) * 5
         Dual(210, array([5]))
-        >>> Dual(5.6) * Dual(1)
+
+        Two dual numbers (univariate):
+
+        >>> ad.Dual(5.6) * ad.Dual(1)
         Dual(5.6, array([6.6]))
-        >>> Dual(-9, [1, 2]) * Dual(4, [2, -9])
+
+        Two dual numbers (multivariate):
+
+        >>> ad.Dual(-9, [1, 2]) * ad.Dual(4, [2, -9])
         Dual(-36, array([-14,  89]))
         """
         if other := self._compatible(other, "*"):
@@ -288,16 +389,21 @@ class Dual:
 
         Examples
         --------
-        >>> 1.2 * Dual(42)
+        Scalar and dual number (univariate):
+
+        >>> 1.2 * ad.Dual(42)
         Dual(50.4, array([1.2]))
-        >>> -3 * Dual(42, [1, 2])
+
+        Scalar and dual number (multivariate):
+
+        >>> -3 * ad.Dual(42, [1, 2])
         Dual(-126, array([-3., -6.]))
         """
         return self * other
 
     def __truediv__(self, other):
         """
-        Return the quotient of `self` and `other`.
+        Return the quotient of ``self`` and ``other``.
 
         Parameters
         ----------
@@ -310,11 +416,19 @@ class Dual:
 
         Examples
         --------
-        >>> Dual(42) / 5
+        Dual number and scalar:
+
+        >>> ad.Dual(42) / 5
         Dual(8.4, array([0.2]))
-        >>> Dual(4) / Dual(5)
+
+        Two dual numbers (univariate):
+
+        >>> ad.Dual(4) / ad.Dual(5)
         Dual(0.8, array([0.04]))
-        >>> Dual(42, [1, 2]) / Dual(1, [3, 4])
+
+        Two dual numbers (multivariate):
+
+        >>> ad.Dual(42, [1, 2]) / ad.Dual(1, [3, 4])
         Dual(42.0, array([-125., -166.]))
         """
         if other := self._compatible(other, "/"):
@@ -337,10 +451,15 @@ class Dual:
         out : Dual
 
         Examples
-        --------        
-        >>> 2 / Dual(4)
+        --------
+        Scalar and dual number (univariate):
+
+        >>> 2 / ad.Dual(4)
         Dual(0.5, array([-0.125]))
-        >>> 2 / Dual(4, [1, 2])
+
+        Scalar and dual number (multivariate):
+
+        >>> 2 / ad.Dual(4, [1, 2])
         Dual(0.5, array([-0.125, -0.25 ]))
         """
         if other := self._compatible(other, "/"):
@@ -350,7 +469,7 @@ class Dual:
 
     def __pow__(self, other):
         """
-        Return `self` to the power of `other`.
+        Return ``self`` to the power of ``other``.
 
         Parameters
         ----------
@@ -363,37 +482,47 @@ class Dual:
 
         Notes
         -----
-        If `other` is a non-integer scalar and `self.val` is less than zero,
+        If ``other`` is a non-integer scalar and ``self.val`` is less than zero,
         the derivative is a complex number. This will raise a ValueError. Only integer
         powers are supported if the base is negative.
 
-        If `self.val` is equal to zero and `other` is less than one, we cannot
+        If ``self.val`` is equal to zero and ``other`` is less than one, we cannot
         compute the derivative of the result due to a ZeroDivisionError.
         
-        If `other` is a Dual and `self.val` is less than or equal to zero, we cannot
+        If ``other`` is a Dual and ``self.val`` is less than or equal to zero, we cannot
         compute the derivative of the result since the log of a negative number is
         not defined. This will raise a ValueError.
 
         Examples
         --------
-        >>> Dual(2) ** 5
+        Dual number and scalar:
+
+        >>> ad.Dual(2) ** 5
         Dual(32, array([80]))
-        >>> Dual(2, [1]) ** Dual(3, [2])
+
+        Two dual numbers (univariate):
+
+        >>> ad.Dual(2, [1]) ** ad.Dual(3, [2])
         Dual(8, array([23.09035489]))
-        >>> Dual(3, [1, 2]) ** Dual(2, [3, 4])
+
+        Two dual numbers (multivariate):
+
+        >>> ad.Dual(3, [1, 2]) ** ad.Dual(2, [3, 4])
         Dual(9, array([35.66253179, 51.55004239]))
 
-        Errors
-        ------
-        >>> Dual(-1) ** 1.2
+        Example of errors raised (see notes above):
+
+        >>> ad.Dual(-1) ** 1.2
         Traceback (most recent call last):
         ...
         ValueError: -1 cannot be raised to the power of 1.2; only integer powers are allowed if base is negative
-        >>> Dual(0) ** -2
+        
+        >>> ad.Dual(0) ** -2
         Traceback (most recent call last):
         ...
         ZeroDivisionError: 0.0 cannot be raised to a negative power
-        >>> Dual(0) ** Dual(1)
+        
+        >>> ad.Dual(0) ** ad.Dual(1)
         Traceback (most recent call last):
         ...
         ValueError: 0 cannot be raised to the power of 1; log is undefined for x = 0
@@ -422,7 +551,7 @@ class Dual:
 
     def __rpow__(self, other):
         """
-        Return `other` to the power of `self` if `other` is not a Dual number.
+        Return ``other`` to the power of ``self`` if ``other`` is not a Dual number.
 
         Parameters
         ----------
@@ -435,11 +564,19 @@ class Dual:
 
         Examples
         --------
-        >>> 5 ** Dual(2)
+        Scalar and dual number (univariate):
+
+        >>> 5 ** ad.Dual(2)
         Dual(25, array([40.23594781]))
-        >>> Dual(2, [1]) ** 3
+
+        Scalar and dual number (multivariate):
+
+        >>> ad.Dual(2, [1]) ** 3
         Dual(8, array([12]))
-        >>> Dual(2, [1, 2]) ** Dual(3, [3, 4])
+
+        Two dual numbers (univariate):
+
+        >>> ad.Dual(2, [1, 2]) ** ad.Dual(3, [3, 4])
         Dual(8, array([28.63553233, 46.18070978]))
         """
         if other <= 0:
@@ -453,7 +590,7 @@ class Dual:
 
     def __neg__(self):
         """
-        Return negation of `self`.
+        Return negation of ``self``.
 
         Parameters
         ----------
@@ -465,9 +602,14 @@ class Dual:
 
         Examples
         --------
-        >>> -Dual(42)
+        Dual number (univariate):
+
+        >>> -ad.Dual(42)
         Dual(-42, array([-1]))
-        >>> -Dual(42, [1, 2])
+
+        Dual number (multivariate):
+
+        >>> -ad.Dual(42, [1, 2])
         Dual(-42, array([-1, -2]))
         """
         return Dual(-self.val, -self.der)
@@ -475,8 +617,8 @@ class Dual:
     def __lt__(self, other):
         """
         Return element-wise (value and derivative vector) less than comparison of
-        `self` and `other`.
-        and `other`.
+        ``self`` and ``other``.
+        and ``other``.
 
         Parameters
         ----------
@@ -489,11 +631,19 @@ class Dual:
 
         Examples
         --------
-        >>> Dual(42) < 5
+        Dual number and scalar:
+
+        >>> ad.Dual(42) < 5
         (False, array([False]))
-        >>> Dual(1, [2]) < Dual(5, [1])
+        
+        Two dual numbers (univariate):
+
+        >>> ad.Dual(1, [2]) < ad.Dual(5, [1])
         (True, array([False]))
-        >>> Dual(1, [4, 1]) < Dual(5, [1, 2])
+
+        Two dual numbers (multivariate):
+
+        >>> ad.Dual(1, [4, 1]) < ad.Dual(5, [1, 2])
         (True, array([False, True]))
         """
         if other := self._compatible(other, "<"):
@@ -502,7 +652,7 @@ class Dual:
     def __gt__(self, other):
         """
         Return element-wise (value and derivative vector) greater than comparison of
-        `self` and `other`.
+        ``self`` and ``other``.
 
         Parameters
         ----------
@@ -515,11 +665,19 @@ class Dual:
 
         Examples
         --------
-        >>> Dual(42) > 5
+        Dual number and scalar:
+
+        >>> ad.Dual(42) > 5
         (True, array([True]))
-        >>> Dual(1, [2]) > Dual(5, [1])
+
+        Two dual numbers (univariate):
+
+        >>> ad.Dual(1, [2]) > ad.Dual(5, [1])
         (False, array([True]))
-        >>> Dual(1, [4, 1]) > Dual(5, [1, 2])
+
+        Two dual numbers (multivariate):
+
+        >>> ad.Dual(1, [4, 1]) > ad.Dual(5, [1, 2])
         (False, array([True, False]))
         """
         if other := self._compatible(other, ">"):
@@ -528,7 +686,7 @@ class Dual:
     def __le__(self, other):
         """
         Return element-wise (value and derivative vector) less than or equal to
-        comparison of `self` and `other`.
+        comparison of ``self`` and ``other``.
 
         Parameters
         ----------
@@ -541,11 +699,19 @@ class Dual:
 
          Examples
         --------
-        >>> Dual(42) <= 5
+        Dual number and scalar:
+
+        >>> ad.Dual(42) <= 5
         (False, array([False]))
-        >>> Dual(1, [2]) <= Dual(5, [2])
+
+        Two dual numbers (univariate):
+
+        >>> ad.Dual(1, [2]) <= ad.Dual(5, [2])
         (True, array([True]))
-        >>> Dual(6, [1, 1]) <= Dual(5, [1, 2])
+
+        Two dual numbers (multivariate):
+
+        >>> ad.Dual(6, [1, 1]) <= ad.Dual(5, [1, 2])
         (False, array([True, True]))
         """
         if other := self._compatible(other, "<="):
@@ -554,7 +720,7 @@ class Dual:
     def __ge__(self, other):
         """
         Return element-wise (value and derivative vector) greater than or equal to
-        comparison of `self` and `other`.
+        comparison of ``self`` and ``other``.
 
         Parameters
         ----------
@@ -567,11 +733,19 @@ class Dual:
 
         Examples
         --------
-        >>> Dual(42) >= 5
+        Dual number and scalar:
+
+        >>> ad.Dual(42) >= 5
         (True, array([True]))
-        >>> Dual(5, [2]) >= Dual(5, [1])
+
+        Two dual numbers (univariate):
+
+        >>> ad.Dual(5, [2]) >= ad.Dual(5, [1])
         (True, array([True]))
-        >>> Dual(5, [4, 2]) >= Dual(5, [1, 2])
+
+        Two dual numbers (multivariate):
+
+        >>> ad.Dual(5, [4, 2]) >= ad.Dual(5, [1, 2])
         (True, array([True, True]))
         """
         if other := self._compatible(other, ">="):
@@ -580,7 +754,7 @@ class Dual:
     def __eq__(self, other):
         """
         Return element-wise (value and derivative vector) equality comparison of
-        `self` and `other`.
+        ``self`` and ``other``.
 
         Parameters
         ----------
@@ -593,11 +767,19 @@ class Dual:
 
         Examples
         --------
-        >>> Dual(42) == 5
+        Dual number and scalar:
+
+        >>> ad.Dual(42) == 5
         (False, array([False]))
-        >>> Dual(5, [2]) == Dual(5, [1])
+
+        Two dual numbers (univariate):
+
+        >>> ad.Dual(5, [2]) == ad.Dual(5, [1])
         (True, array([False]))
-        >>> Dual(2, [4, 2]) == Dual(5, [1, 2])
+
+        Two dual numbers (multivariate):
+
+        >>> ad.Dual(2, [4, 2]) == ad.Dual(5, [1, 2])
         (False, array([False,  True]))
         """
         if other := self._compatible(other, "=="):
@@ -606,7 +788,7 @@ class Dual:
     def __ne__(self, other):
         """
         Return element-wise (value and derivative vector) inequality comparison of
-        `self` and `other`.
+        ``self`` and ``other``.
 
         Parameters
         ----------
@@ -619,11 +801,19 @@ class Dual:
 
         Examples
         --------
-        >>> Dual(42) != 5
+        Dual number and scalar:
+
+        >>> ad.Dual(42) != 5
         (True, array([True]))
-        >>> Dual(5, [2]) != Dual(5, [1])
+
+        Two dual numbers (univariate):
+
+        >>> ad.Dual(5, [2]) != ad.Dual(5, [1])
         (False, array([True]))
-        >>> Dual(2, [4, 2]) != Dual(5, [1, 2])
+
+        Two dual numbers (multivariate):
+
+        >>> ad.Dual(2, [4, 2]) != ad.Dual(5, [1, 2])
         (True, array([True,  False]))
         """
         if other := self._compatible(other, "!="):
