@@ -18,13 +18,15 @@ def sin(x):
 
     Returns
     -------
-    out : float or Dual
+    y : float or Dual
 
     Examples
     --------
-    >>> sin(np.pi / 2)
+    >>> ad.sin(np.pi / 2)
     1.0
-    >>> sin(Dual(np.pi / 2, 1))
+
+    >>> x = ad.Dual(np.pi / 2)
+    >>> ad.sin(x)
     Dual(1.0, array([0.0]))
     """
     try:
@@ -45,13 +47,15 @@ def cos(x):
 
     Returns
     -------
-    out : float or Dual
+    y : float or Dual
 
     Examples
     --------
-    >>> cos(np.pi / 2)
+    >>> ad.cos(np.pi / 2)
     0.0
-    >>> cos(Dual(np.pi / 2, 1))
+
+    >>> x = ad.Dual(np.pi / 2)
+    >>> ad.cos(x)
     Dual(0.0, array([-1.0]))
     """
     try:
@@ -72,7 +76,7 @@ def tan(x):
 
     Returns
     -------
-    out : float or Dual
+    y : float or Dual
 
     Notes
     -----
@@ -80,10 +84,20 @@ def tan(x):
 
     Examples
     --------
-    >>> tan(np.pi / 4)
+    >>> ad.tan(np.pi / 4)
     1.0
-    >>> tan(Dual(np.pi / 4, 1))
+
+    >>> x = ad.Dual(np.pi / 4)
+    >>> ad.tan(x)
     Dual(1.0, array([2.0]))
+
+    Derivative undefined:
+
+    >>> x = ad.Dual(np.pi / 2)
+    >>> ad.tan(x)
+    Traceback (most recent call last):
+    ...
+    ValueError: Derivative of tan(x) is undefined for x = 1.5707963267948966
     """
     try:
         if np.isclose(np.cos(x.val), 0):
@@ -106,13 +120,15 @@ def sinh(x):
 
     Returns
     -------
-    out : float or Dual
+    y : float or Dual
 
     Examples
     --------
-    >>> sinh(1)
+    >>> ad.sinh(1)
     1.1752011936438014
-    >>> sinh(Dual(2, 1))
+
+    >>> x = ad.Dual(2, 1)
+    >>> ad.sinh(x)
     Dual(3.6268604078470186, array([3.76219569]))
     """
     try:
@@ -133,13 +149,15 @@ def cosh(x):
 
     Returns
     -------
-    out : float or Dual
+    y : float or Dual
 
     Examples
     --------
-    >>> cosh(1)
+    >>> ad.cosh(1)
     1.5430806348152437
-    >>> cosh(Dual(2, 1))
+
+    >>> x = ad.Dual(2, 1)
+    >>> ad.cosh(x)
     Dual(3.7621956910836314, array([3.62686041]))
     """
     try:
@@ -160,13 +178,15 @@ def tanh(x):
 
     Returns
     -------
-    out : float or Dual
+    y : float or Dual
 
     Examples
     --------
-    >>> tanh(1)
+    >>> ad.tanh(1)
     0.7615941559557649
-    >>> tanh(Dual(1, 1))
+
+    >>> x = ad.Dual(1, 1)
+    >>> ad.tanh(x)
     Dual(0.7615941559557649, array([0.41997434]))
     """
     try:
@@ -187,7 +207,7 @@ def arcsin(x):
 
     Returns
     -------
-    out : float or Dual
+    y : float or Dual
 
     Notes
     -----
@@ -195,11 +215,17 @@ def arcsin(x):
 
     Examples
     --------
-    >>> arcsin(1)
+    >>> ad.arcsin(1)
     1.5707963267948966
-    >>> arcsin(Dual(0.5, 1))
+
+    >>> x = ad.Dual(0.5, 1)
+    >>> ad.arcsin(x)
     Dual(0.5235987755982988, array([1.15470054]))
-    >>> arcsin(Dual(1, 1))
+
+    Derivative undefined:
+
+    >>> x = ad.Dual(1, 1)
+    >>> ad.arcsin(x)
     Traceback (most recent call last):
     ...
     ValueError: Derivative of arcsin(x) is undefined for x = 1
@@ -225,7 +251,7 @@ def arccos(x):
 
     Returns
     -------
-    out : float or Dual
+    y : float or Dual
 
     Notes
     -----
@@ -233,11 +259,17 @@ def arccos(x):
 
     Examples
     --------
-    >>> arccos(1)
+    >>> ad.arccos(1)
     0.0
-    >>> arccos(Dual(0.5, 1))
+
+    >>> x = ad.Dual(0.5, 1)
+    >>> ad.arccos(x)
     Dual(1.0471975511965976, array([-1.15470054]))
-    >>> arccos(Dual(1, 1))
+
+    Derivative undefined:
+
+    >>> x = ad.Dual(1, 1)
+    >>> ad.arccos(x)
     Traceback (most recent call last):
     ...
     ValueError: Derivative of arccos(x) is undefined for x = 1
@@ -263,13 +295,15 @@ def arctan(x):
 
     Returns
     -------
-    out : float or Dual
+    y : float or Dual
 
     Examples
     --------
-    >>> arctan(1)
+    >>> ad.arctan(1)
     0.7853981633974483
-    >>> arctan(Dual(1, 1))
+
+    >>> x = ad.Dual(1, 1)
+    >>> ad.arctan(x)
     Dual(0.7853981633974483, array([0.5]))
     """
     try:
@@ -290,13 +324,15 @@ def exp(x):
 
     Returns
     -------
-    out : float or Dual
+    y : float or Dual
 
     Examples
     --------
-    >>> exp(1)
+    >>> ad.exp(1)
     2.718281828459045
-    >>> exp(Dual(1, -2))
+
+    >>> x = ad.Dual(1, -2)
+    >>> ad.exp(x)
     Dual(2.718281828459045, array([-5.43656366]))
     """
     try:
@@ -317,7 +353,7 @@ def log(x):
 
     Returns
     -------
-    out : float or Dual
+    y : float or Dual
 
     Notes
     -----
@@ -325,11 +361,17 @@ def log(x):
 
     Examples
     --------
-    >>> log(2)
+    >>> ad.log(2)
     0.6931471805599453
-    >>> log(Dual(2, -1.5))
+
+    >>> x = ad.Dual(2, -1.5)
+    >>> ad.log(x)
     Dual(0.6931471805599453, array([-0.75]))
-    >>> log(Dual(0, 1))
+
+    Derivative undefined:
+
+    >>> x = ad.Dual(0, 1)
+    >>> ad.log(x)
     Traceback (most recent call last):
     ...
     ValueError: Log of x is undefined for x = 0
@@ -356,7 +398,7 @@ def sqrt(x):
 
     Returns
     -------
-    out : float or Dual
+    y : float or Dual
 
     Notes
     -----
@@ -364,11 +406,17 @@ def sqrt(x):
 
     Examples
     --------
-    >>> sqrt(4)
+    >>> ad.sqrt(4)
     2.0
-    >>> sqrt(Dual(4, -1.5))
+
+    >>> x = ad.Dual(4, -1.5)
+    >>> ad.sqrt(x)
     Dual(2.0, array([-0.375]))
-    >>> sqrt(Dual(-1, 1))
+
+    Derivative undefined:
+
+    >>> x = ad.Dual(-1, 1)
+    >>> ad.sqrt(x)
     Traceback (most recent call last):
     ...
     ValueError: sqrt(x) is undefined for x < 0
@@ -395,13 +443,15 @@ def logistic(x):
 
     Returns
     -------
-    out : float or Dual
+    y : float or Dual
 
     Examples
     --------
-    >>> logistic(1)
+    >>> ad.logistic(1)
     0.7310585786300049
-    >>> logistic(Dual(3, 2))
+
+    >>> x = ad.Dual(3, 2)
+    >>> ad.logistic(x)
     Dual(0.9525741268224334, array([0.09035332]))
     """
     g = lambda z: 1 / (1 + np.exp(-z))
