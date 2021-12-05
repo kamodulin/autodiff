@@ -69,7 +69,8 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
+docs/sphinx/_build/
+docs/sphinx/*/api/
 
 # PyBuilder
 target/
@@ -130,3 +131,4 @@ dmypy.json
 
 .DS_Store
 .vscode
+.docs
