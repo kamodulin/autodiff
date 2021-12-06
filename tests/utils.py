@@ -22,7 +22,7 @@ def _compare_node(comparison, val, der, eval_der):
 
     return (np.isclose(x.val, val) and np.isclose(eval_der, der).all()) if eval_der is not None else (np.isclose(x.val, val) and eval_der == None)
 
-def fdn(g, x, epi = 1e-4):
+def fdn(g, x, epi = 1e-6):
     f = lambda y: g(*y)
     d = len(x)
     mat = np.eye(d) * epi
