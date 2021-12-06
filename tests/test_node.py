@@ -9,13 +9,17 @@ from utils import _equal, _compare_node
 @pytest.mark.parametrize("val", [1, -6.2])
 def test_node_constant(val):
     x = ad.Node.constant(val)
-    assert _equal(x, val, 0, np.array([x.grad()]))
+    der = 0
+    eval_der = np.array([x.grad()])
+    assert _equal(x, val, der, eval_der)
 
 
 @pytest.mark.parametrize("val", [0.7, -64])
 def test_node_variable(val):
     x = ad.Node(val)
-    assert _equal(x, val, 1.0, np.array([x.grad()]))
+    der = 1.0
+    eval_der = np.array([x.grad()])
+    assert _equal(x, val, der, eval_der)
 
 
 @pytest.mark.parametrize("vals", [np.array([-3.4, 6]), np.array([-1, 6])])
@@ -23,7 +27,9 @@ def test_node_from_array(vals):
     xs = list(ad.Node.from_array(vals))
 
     for x, val in zip(xs, vals):
-        assert _equal(x, val, 1.0, np.array([x.grad()]))
+        der = 1.0
+        eval_der = np.array([x.grad()])
+        assert _equal(x, val, der, eval_der)
 
 
 def test_node_from_non_1d_array():
@@ -34,7 +40,9 @@ def test_node_from_non_1d_array():
 @pytest.mark.parametrize("val", [[0.7], [-64]])
 def test_node_from_array_single_val(val):
     x = ad.Node.from_array(val)
-    assert _equal(x, val[0], 1, np.array([x.grad()]))
+    der = 1
+    eval_der = np.array([x.grad()])
+    assert _equal(x, val[0], der, eval_der)
 
 
 def test_node_compat_type_error():

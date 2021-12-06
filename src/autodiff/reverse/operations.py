@@ -9,6 +9,26 @@ __all__ = [
 
 
 def sin(x):
+    """
+    Return the sine of x.
+
+    Parameters
+    ----------
+    x : int, float, Node
+
+    Returns
+    -------
+    y : float or Node
+
+    Examples
+    --------
+    >>> sin(np.pi / 2)
+    1.0
+
+    >>> x = ad.Node(np.pi / 2)
+    >>> ad.sin(x)
+    Node(1.0)
+    """
     try:
         child = Node(np.sin(x.val))
         x._addChildren(np.cos(x.val), child)
@@ -18,6 +38,26 @@ def sin(x):
 
 
 def cos(x):
+    """
+    Return the cosine of x.
+
+    Parameters
+    ----------
+    x : int, float, Node
+
+    Returns
+    -------
+    y : float or Node
+
+    Examples
+    --------
+    >>> ad.cos(np.pi / 2)
+    0.0
+
+    >>> x = ad.Node(np.pi / 2)
+    >>> ad.cos(x)
+    Node(0)
+    """
     try:
         child = Node(np.cos(x.val))
         x._addChildren(-np.sin(x.val), child)
@@ -27,6 +67,38 @@ def cos(x):
 
 
 def tan(x):
+    """
+    Return the tangent of x.
+
+    Parameters
+    ----------
+    x : int, float, Node
+
+    Returns
+    -------
+    y : float or Node
+
+    Notes
+    -----
+    The derivative of tan(x) is undefined when the cosine of x is zero.
+
+    Examples
+    --------
+    >>> ad.tan(np.pi / 4)
+    1.0
+
+    >>> x = ad.Node(np.pi / 4)
+    >>> ad.tan(x)
+    Node(1.0)
+
+    Derivative undefined:
+    
+    >>> x = ad.Node(np.pi / 2)
+    >>> ad.tan(x)
+    Traceback (most recent call last):
+    ...
+    ValueError: Derivative of tan(x) is undefined for x = 1.5707963267948966
+    """
     try:
         if np.isclose(np.cos(x.val), 0):
             raise ValueError(
@@ -39,6 +111,26 @@ def tan(x):
 
 
 def sinh(x):
+    """
+    Return the hyperbolic sine of x.
+
+    Parameters
+    ----------
+    x : int, float, Node
+
+    Returns
+    -------
+    y : float or Node
+
+    Examples
+    --------
+    >>> ad.sinh(1)
+    1.1752011936438014
+
+    >>> x = ad.Node(2)
+    >>> ad.sinh(x)
+    Node(3.626860407847019)
+    """
     try:
         child = Node(np.sinh(x.val))
         x._addChildren(np.cosh(x.val), child)
@@ -48,6 +140,26 @@ def sinh(x):
 
 
 def cosh(x):
+    """
+    Return the hyperbolic cosine of x.
+
+    Parameters
+    ----------
+    x : int, float, Node
+
+    Returns
+    -------
+    y : float or Node
+
+    Examples
+    --------
+    >>> ad.cosh(1)
+    1.5430806348152437
+
+    >>> x = ad.Node(2)
+    >>> ad.cosh(x)
+    Node(3.7621956910836314)
+    """
     try:
         child = Node(np.cosh(x.val))
         x._addChildren(np.sinh(x.val), child)
@@ -57,6 +169,26 @@ def cosh(x):
 
 
 def tanh(x):
+    """
+    Return the hyperbolic tangent of x.
+
+    Parameters
+    ----------
+    x : int, float, Node
+
+    Returns
+    -------
+    y : float or Node
+
+    Examples
+    --------
+    >>> ad.tanh(1)
+    0.7615941559557649
+
+    >>> x = ad.Node(1)
+    >>> ad.tanh(x)
+    Node(0.7615941559557649)
+    """
     try:
         child = Node(np.tanh(x.val))
         x._addChildren((1 - np.tanh(x.val)**2), child)
@@ -66,6 +198,38 @@ def tanh(x):
 
 
 def arcsin(x):
+    """
+    Return the inverse sine of x.
+
+    Parameters
+    ----------
+    x : int, float, Node
+
+    Returns
+    -------
+    y : float or Node
+
+    Notes
+    -----
+    The derivative of arcsin(x) is undefined when x is not in the range (-1, 1).
+
+    Examples
+    --------
+    >>> ad.arcsin(1)
+    1.5707963267948966
+
+    >>> x = ad.Node(0.5)
+    >>> ad.arcsin(x)
+    Node(0.5235987755982989)
+
+    Derivative undefined:
+
+    >>> x = ad.Node(1)
+    >>> ad.arcsin(x)
+    Traceback (most recent call last):
+    ...
+    ValueError: Derivative of arcsin(x) is undefined for x = 1
+    """
     try:
         if abs(x.val) >= 1:
             raise ValueError(
@@ -78,6 +242,38 @@ def arcsin(x):
 
 
 def arccos(x):
+    """
+    Return the inverse cosine of x.
+
+    Parameters
+    ----------
+    x : int, float, Node
+
+    Returns
+    -------
+    y : float or Node
+
+    Notes
+    -----
+    The derivative of arccos(x) is undefined when x is not in the range (-1, 1).
+
+    Examples
+    --------
+    >>> ad.arccos(1)
+    0.0
+    
+    >>> x = ad.Node(0.5)
+    >>> ad.arccos(x)
+    Node(1.0471975511965979)
+
+    Derivative undefined:
+
+    >>> x = ad.Node(1)
+    >>> ad.arccos(x)
+    Traceback (most recent call last):
+    ...
+    ValueError: Derivative of arcsin(x) is undefined for x = 1
+    """
     try:
         if abs(x.val) >= 1:
             raise ValueError(
@@ -90,6 +286,26 @@ def arccos(x):
 
 
 def arctan(x):
+    """
+    Return the inverse tangent of x.
+
+    Parameters
+    ----------
+    x : int, float, Node
+
+    Returns
+    -------
+    y : float or Node
+
+    Examples
+    --------
+    >>> ad.arctan(1)
+    0.7853981633974483
+
+    >>> x = ad.Node(1)
+    >>> ad.arctan(x)
+    Node(0.7853981633974483)
+    """
     try:
         child = Node(np.arctan(x.val))
         x._addChildren((1 / (1 + x.val**2)), child)
@@ -99,6 +315,26 @@ def arctan(x):
 
 
 def exp(x):
+    """
+    Return the exponential of x.
+
+    Parameters
+    ----------
+    x : int, float, Node
+
+    Returns
+    -------
+    y : float or Node
+
+    Examples
+    --------
+    >>> ad.exp(1)
+    2.718281828459045
+
+    >>> x = ad.Node(1)
+    >>> ad.exp(x)
+    Node(2.718281828459045)
+    """
     try:
         child = Node(np.exp(x.val))
         x._addChildren(np.exp(x.val), child)
@@ -108,6 +344,38 @@ def exp(x):
 
 
 def log(x):
+    """
+    Return the natural logarithm of x.
+
+    Parameters
+    ----------
+    x : int, float, Node
+
+    Returns
+    -------
+    y : float or Node
+
+    Notes
+    -----
+    The log of x is undefined when x is less than or equal to 0.
+
+    Examples
+    --------
+    >>> ad.log(2)
+    0.6931471805599453
+
+    >>> x = ad.Node(2)
+    >>> ad.log(x)
+    Node(0.6931471805599453)
+
+    Derivative undefined:
+
+    >>> x = ad.Node(0)
+    >>> ad.log(x)
+    Traceback (most recent call last):
+    ...
+    ValueError: Log of x is undefined for x = 0
+    """
     try:
         if x.val <= 0:
             raise ValueError(f"Log of x is undefined for x = {x.val}")
@@ -121,6 +389,38 @@ def log(x):
 
 
 def sqrt(x):
+    """
+    Return the square root of x.
+
+    Parameters
+    ----------
+    x : int, float, Node
+
+    Returns
+    -------
+    y : float or Node
+
+    Notes
+    -----
+    The square root of x is undefined when x is less than 0.
+
+    Examples
+    --------
+    >>> ad.sqrt(4)
+    2.0
+
+    >>> x = ad.Node(4)
+    >>> ad.sqrt(x)
+    Node(2.0)
+
+    Derivative undefined:
+
+    >>> x = ad.Node(-1)
+    >>> ad.sqrt(x)
+    Traceback (most recent call last):
+    ...
+    ValueError: Derivative of sqrt(x) is undefined for x < 0
+    """
     try:
         if x.val < 0:
             raise ValueError(f"Derivative of sqrt(x) is undefined for x < 0")
@@ -134,6 +434,26 @@ def sqrt(x):
 
 
 def logistic(x):
+    """
+    Return the logistic function of x.
+
+    Parameters
+    ----------
+    x : int, float, Node
+
+    Returns
+    -------
+    y : float or Node
+
+    Examples
+    --------
+    >>> ad.logistic(1)
+    0.7310585786300049
+
+    >>> x = ad.Node(3)
+    >>> ad.logistic(x)
+    Node(0.9525741268224334)
+    """
     g = lambda z: 1 / (1 + np.exp(-z))
     try:
         child = Node(g(x.val))
