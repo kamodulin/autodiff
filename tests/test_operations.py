@@ -153,7 +153,7 @@ def test_log_invalid_base(val, base):
     x = ad.Dual(val)
     with pytest.raises(ValueError):
         ad.log(x, base)
-        
+
 
 @pytest.mark.parametrize("val", [1, 2])
 @pytest.mark.parametrize("base", [2, 10, 6.2])
