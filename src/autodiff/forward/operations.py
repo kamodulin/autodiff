@@ -343,17 +343,18 @@ def exp(x):
         return np.exp(x)
 
 
-def log(x):
+def log(x, base=np.e):
     """
-    Return the natural logarithm of x.
+    Return the logarithm of x of any base, default to natural log.
 
     Parameters
     ----------
     x : int, float, Dual
+    base : int, float
 
     Returns
     -------
-    y : float or Dual
+    out : float or Dual
 
     Notes
     -----
@@ -368,6 +369,16 @@ def log(x):
     >>> ad.log(x)
     Dual(0.6931471805599453, array([-0.75]))
 
+    Logarithm with different base:
+
+    >>> x = ad.Dual(2, -1.5)
+    >>> log(x, base=10)
+    Dual(0.30102999566398114, array([-0.32572086]))
+
+    >>> x = ad.Dual(2, -1.5)
+    >>> log(x, base=2)
+    Dual(1.0, array([-1.08202128]))
+
     Derivative undefined:
 
     >>> x = ad.Dual(0, 1)
@@ -375,17 +386,27 @@ def log(x):
     Traceback (most recent call last):
     ...
     ValueError: Log of x is undefined for x = 0
+
+    Error when base is non-positive:
+
+    >>> x = ad.Dual(1, 1)
+    >>> ad.log(x, base=0)
+    Traceback (most recent call last):
+    ...
+    ValueError: Logarithm base must be positive
     """
+    if base <= 0:
+        raise ValueError(f"Logarithm base must be positive")
     try:
         if x.val <= 0:
             raise ValueError(f"Log of x is undefined for x = {x.val}")
-        val = np.log(x.val)
-        der = x.der / x.val
+        val = np.log(x.val) / np.log(base)
+        der = x.der / (x.val * np.log(base))
         return Dual(val, der)
     except AttributeError:
         if x <= 0:
             raise ValueError(f"Log of x is undefined for x = {x}")
-        return np.log(x)
+        return np.log(x) / np.log(base)
 
 
 def sqrt(x):

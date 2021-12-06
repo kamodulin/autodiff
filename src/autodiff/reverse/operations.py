@@ -22,7 +22,7 @@ def sin(x):
 
     Examples
     --------
-    >>> sin(np.pi / 2)
+    >>> ad.sin(np.pi / 2)
     1.0
 
     >>> x = ad.Node(np.pi / 2)
@@ -343,17 +343,18 @@ def exp(x):
         return np.exp(x)
 
 
-def log(x):
+def log(x, base=np.e):
     """
-    Return the natural logarithm of x.
+    Return the logarithm of x of any base, default to natural log.
 
     Parameters
     ----------
-    x : int, float, Node
+    x : int, float, Dual
+    base : int, float
 
     Returns
     -------
-    y : float or Node
+    out : float or Dual
 
     Notes
     -----
@@ -368,6 +369,14 @@ def log(x):
     >>> ad.log(x)
     Node(0.6931471805599453)
 
+    >>> x = ad.Node(2)
+    >>> ad.log(x, base=10)
+    Node(0.30102999566398114)
+
+    >>> x = ad.Node(2)
+    >>> ad.log(x, base=2)
+    Node(1.0)
+
     Derivative undefined:
 
     >>> x = ad.Node(0)
@@ -375,17 +384,27 @@ def log(x):
     Traceback (most recent call last):
     ...
     ValueError: Log of x is undefined for x = 0
+
+    Error when base is non-positive:
+
+    >>> x = ad.Node(2)
+    >>> ad.log(x, base=0)
+    Traceback (most recent call last):
+    ...
+    ValueError: Cannot have non-positive base
     """
+    if base <= 0:
+        raise ValueError(f'Cannot have non-positive base')
     try:
         if x.val <= 0:
             raise ValueError(f"Log of x is undefined for x = {x.val}")
-        child = Node(np.log(x.val))
-        x._addChildren((1 / x.val), child)
+        child = Node((np.log(x.val) / np.log(base)))
+        x._addChildren((1 / (x.val * np.log(base))), child)
         return child
     except AttributeError:
         if x <= 0:
             raise ValueError(f"Log of x is undefined for x = {x}")
-        return np.log(x)
+        return np.log(x) / np.log(base)
 
 
 def sqrt(x):

@@ -323,6 +323,42 @@ def test_log_undefined(val):
         ad.log(x)
 
 
+@pytest.mark.parametrize("val", [0, -2.4, -11])
+@pytest.mark.parametrize("base", [0, -1, -5.7])
+def test_log_invalid_base(val, base):
+    x = ad.Node(val)
+    with pytest.raises(ValueError):
+        ad.log(x, base)
+
+
+@pytest.mark.parametrize("val", [1, 2])
+@pytest.mark.parametrize("base", [2, 10, 6.2])
+def test_log_any_base_number(val, base):
+    x = np.log(val) / np.log(base)
+    out = ad.log(val, base)
+    assert pytest.approx(x, out)
+
+
+@pytest.mark.parametrize("val", [1, 2])
+@pytest.mark.parametrize("base", [2, 10, 6.2])
+def test_log_any_base_constant(val, base):
+    x = ad.Node.constant(val)
+    out = ad.log(x, base)
+    der = 0
+    eval_der = np.array([x.grad()])
+    assert _equal(out, np.log(val) / np.log(base), der, eval_der)
+
+
+@pytest.mark.parametrize("val", [1, 2])
+@pytest.mark.parametrize("base", [2, 10, 6.2])
+def test_log_any_base_variable(val, base):
+    x = ad.Node(val)
+    out = ad.log(x, base)
+    der = 1 / (val * np.log(base))
+    eval_der = np.array([x.grad()])
+    assert _equal(out, np.log(val) / np.log(base), der, eval_der)
+
+
 @pytest.mark.parametrize("val", [1, 6.2])
 def test_sqrt_number(val):
     x = np.sqrt(val)
