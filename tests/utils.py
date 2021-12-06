@@ -20,12 +20,31 @@ def _compare(comparison, val, der):
 def _compare_node(comparison, val, der, eval_der):
     x = adr.Node(comparison)
 
-    return (np.isclose(x.val, val) and np.isclose(eval_der, der).all()) if eval_der is not None else (np.isclose(x.val, val) and eval_der == None)
+    return (np.isclose(x.val, val)
+            and np.isclose(eval_der, der).all()) if eval_der is not None else (
+                np.isclose(x.val, val) and eval_der == None)
 
-def fdn(g, x, epi = 1e-4):
-    f = lambda y: g(*y)
-    d = len(x)
-    mat = np.eye(d) * epi
-    xplus =  x + mat
-    xminus = x - mat
-    return (np.apply_along_axis(f,1,xplus) - np.apply_along_axis(f,1,xminus))/(2*epi)
+
+def fdn(g, X, epi=1e-6):
+    """
+    Gradient checking function with finite difference method.
+
+    Parameters
+    ----------
+    g : function
+        Function to be checked.
+    X : array_like
+        Input array.
+    epi : float, optional
+
+    Returns
+    -------
+    out : list
+        List of gradients.
+    """
+    f = lambda x: g(*x)
+    mat = np.eye(len(X)) * epi
+    X_plus = X + mat
+    X_minus = X - mat
+    return (np.apply_along_axis(f, 1, X_plus) -
+            np.apply_along_axis(f, 1, X_minus)) / (2 * epi)
