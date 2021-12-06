@@ -359,7 +359,6 @@ def test_neg_univariate():
     der = False
     assert _compare((-x == y), val, der)
 
-
 def test_lt_constants():
     x = ad.Dual.constant(2)
     y = ad.Dual.constant(3)
