@@ -391,6 +391,12 @@ def test_sqrt_undefined(val):
         ad.sqrt(x)
 
 
+@pytest.mark.parametrize("val", [-2.4, -11])
+def test_sqrt_number_undefined(val):
+    with pytest.raises(ValueError):
+        ad.sqrt(val)
+
+
 @pytest.mark.parametrize("val", [0.7, 64, -0.5, 10, -10])
 def test_logistic_number(val):
     g = lambda z: 1 / (1 + np.exp(-z))

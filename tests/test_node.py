@@ -62,10 +62,12 @@ def test_zero_grad(vals, ders):
         ad.Node.zero_grad(n)
         assert _equal(n, vals[i], 1.0, np.array([n.grad()]))
 
+
 @pytest.mark.parametrize("val", [1, "1"])
 def test_zero_grad_error(val):
     with pytest.raises(AttributeError):
         ad.Node.zero_grad(val)
+
 
 @pytest.mark.parametrize("val1", [0.7, 64])
 @pytest.mark.parametrize("val2", [-2, 4.2])
@@ -154,7 +156,7 @@ def test_pow_invalid(val1, val2):
         x = ad.Node.constant(val1)
         y = val2
         _ = x**y
-    
+
     with pytest.raises(ValueError):
         x = ad.Node.constant(val1)
         y = ad.Node.constant(val2)
@@ -209,17 +211,18 @@ def test_mul_variable(val1, val2):
     assert _equal(x * y, val1 * val2, np.array([val2, val1]),
                   np.array([x.grad(), y.grad()]))
 
+
 @pytest.mark.parametrize("val1", [0.7, 64])
 @pytest.mark.parametrize("val2", [-2, 4.2])
 def test_rmul_constant(val1, val2):
     x = ad.Node.constant(val1)
     y = val2
-    assert _equal(y * x, val1 * val2, 0,
-                  np.array([x.grad()]))
+    assert _equal(y * x, val1 * val2, 0, np.array([x.grad()]))
 
     x = ad.Node(val1)
     y = val2
-    assert _equal(y * x,val1 * val2, val2, np.array([x.grad()]))
+    assert _equal(y * x, val1 * val2, val2, np.array([x.grad()]))
+
 
 @pytest.mark.parametrize("val1", [0.7, 64])
 @pytest.mark.parametrize("val2", [-2, 4.2])
@@ -284,7 +287,7 @@ def test_neg_variable():
 
 
 def test_lt_variable():
-    x, y = ad.Node(6),ad.Node(4)
+    x, y = ad.Node(6), ad.Node(4)
     with pytest.warns(RuntimeWarning):
         f = x < y
     val = False
@@ -299,22 +302,20 @@ def test_lt_variable():
     assert _compare_node(f[0], val, der, f[1])
 
 
-
 def test_lt_constants():
     x = ad.Node.constant(2)
     y = ad.Node.constant(3)
     val = True
     der = False
     f = x < y
-    assert _compare_node(f[0], val, der,f[1])
+    assert _compare_node(f[0], val, der, f[1])
 
     x = 2
     y = ad.Node.constant(3)
     val = True
     der = False
     f = x < y
-    assert _compare_node(f[0], val, der,f[1])
-
+    assert _compare_node(f[0], val, der, f[1])
 
 
 def test_gt_constants():
@@ -353,7 +354,7 @@ def test_gt_variable():
         f = x > y
     val = False
     der = None
-    assert _compare_node(f[0], val, der, f[1]) 
+    assert _compare_node(f[0], val, der, f[1])
 
 
 def test_le_constants():
@@ -362,14 +363,14 @@ def test_le_constants():
     f = x <= y
     val = False
     der = True
-    assert _compare_node(f[0],val, der, f[1])
+    assert _compare_node(f[0], val, der, f[1])
 
     x = 2
     y = ad.Node.constant(1)
     f = x <= y
     val = False
     der = True
-    assert _compare_node(f[0],val, der, f[1])
+    assert _compare_node(f[0], val, der, f[1])
 
 
 def test_le_variable():
@@ -392,7 +393,7 @@ def test_le_variable():
         f = x <= y
     val = False
     der = None
-    assert _compare_node(f[0], val, der, f[1]) 
+    assert _compare_node(f[0], val, der, f[1])
 
 
 def test_ge_constants():
@@ -401,14 +402,14 @@ def test_ge_constants():
     f = x >= y
     val = False
     der = True
-    assert _compare_node(f[0],val, der, f[1])
+    assert _compare_node(f[0], val, der, f[1])
 
     x = 1
     y = ad.Node.constant(2)
     f = x >= y
     val = False
     der = True
-    assert _compare_node(f[0],val, der, f[1])
+    assert _compare_node(f[0], val, der, f[1])
 
 
 def test_ge_variable():
