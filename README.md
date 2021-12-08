@@ -17,7 +17,7 @@ Any developer who wants to contribute to our codebase can make a new branch and 
 We recommend creating a virtual environment rather than installing in the base environment:
 ```
 python3 -m venv autodiff-env
-source autodiff/bin/activate
+source autodiff-env/bin/activate
 ```
 
 Our package can be installed from Github or PyPI. We also include source distribution files and wheels under Releases.
