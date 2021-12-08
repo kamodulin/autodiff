@@ -22,7 +22,7 @@ copyright = '2021, Xuliang Guo, Kamran Ahmed, Van Anh Le, Hanwen Cui'
 author = 'Xuliang Guo, Kamran Ahmed, Van Anh Le, Hanwen Cui'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.2'
+release = '0.1.0'
 
 
 # -- General configuration ---------------------------------------------------
